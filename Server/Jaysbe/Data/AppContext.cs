@@ -12,18 +12,4 @@ public class AppContext : DbContext
     public AppContext(DbContextOptions<AppContext> options) : base(options)
     {
     }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        
-        /*
-        modelBuilder.Entity("Jaysbe.Models.Category", b =>
-        {
-            b.Property<decimal>("Price")
-                .HasColumnType(typeof(decimal));
-        }
-        */  
-        
-        base.OnModelCreating(modelBuilder);
-    }
 }
