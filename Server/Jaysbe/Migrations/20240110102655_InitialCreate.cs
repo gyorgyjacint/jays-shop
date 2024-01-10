@@ -24,11 +24,11 @@ namespace Jaysbe.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Items",
+                name: "Products",
                 columns: table => new
                 {
-                    ItemId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ItemNumber = table.Column<int>(type: "int", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProductNumber = table.Column<long>(type: "bigint", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(70)", maxLength: 70, nullable: false),
                     Brand = table.Column<string>(type: "nvarchar(70)", maxLength: 70, nullable: true),
                     Price = table.Column<decimal>(type: "decimal(16,2)", precision: 16, scale: 2, nullable: false),
@@ -37,18 +37,17 @@ namespace Jaysbe.Migrations
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     Color = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: true),
                     ThumbnailUrl = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
-                    PicturesUrls = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    PicturesUrls = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Items", x => x.ItemId);
+                    table.PrimaryKey("PK_Products", x => x.ProductId);
                     table.ForeignKey(
-                        name: "FK_Items_Categories_CategoryId",
+                        name: "FK_Products_Categories_CategoryId",
                         column: x => x.CategoryId,
                         principalTable: "Categories",
-                        principalColumn: "CategoryId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "CategoryId");
                 });
 
             migrationBuilder.CreateTable(
@@ -70,32 +69,32 @@ namespace Jaysbe.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ItemDescOption",
+                name: "ProductDescOption",
                 columns: table => new
                 {
-                    ItemDescOptionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProductDescOptionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(70)", maxLength: 70, nullable: false),
                     Option = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
-                    ItemId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ItemDescOption", x => x.ItemDescOptionId);
+                    table.PrimaryKey("PK_ProductDescOption", x => x.ProductDescOptionId);
                     table.ForeignKey(
-                        name: "FK_ItemDescOption_Items_ItemId",
-                        column: x => x.ItemId,
-                        principalTable: "Items",
-                        principalColumn: "ItemId");
+                        name: "FK_ProductDescOption_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "ProductId");
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ItemDescOption_ItemId",
-                table: "ItemDescOption",
-                column: "ItemId");
+                name: "IX_ProductDescOption_ProductId",
+                table: "ProductDescOption",
+                column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Items_CategoryId",
-                table: "Items",
+                name: "IX_Products_CategoryId",
+                table: "Products",
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
@@ -108,13 +107,13 @@ namespace Jaysbe.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ItemDescOption");
+                name: "ProductDescOption");
 
             migrationBuilder.DropTable(
                 name: "SubCategories");
 
             migrationBuilder.DropTable(
-                name: "Items");
+                name: "Products");
 
             migrationBuilder.DropTable(
                 name: "Categories");

@@ -5,14 +5,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using AppContext = Jaysbe.Data.AppContext;
 
 #nullable disable
 
 namespace Jaysbe.Migrations
 {
-    [DbContext(typeof(AppContext))]
-    partial class AppContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(AppDbContext))]
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -25,7 +24,7 @@ namespace Jaysbe.Migrations
 
             modelBuilder.Entity("Jaysbe.Models.Category", b =>
                 {
-                    b.Property<Guid>("CategoryId")
+                    b.Property<Guid?>("CategoryId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -39,9 +38,9 @@ namespace Jaysbe.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("Jaysbe.Models.Item", b =>
+            modelBuilder.Entity("Jaysbe.Models.Product", b =>
                 {
-                    b.Property<Guid>("ItemId")
+                    b.Property<Guid?>("ProductId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -49,7 +48,7 @@ namespace Jaysbe.Migrations
                         .HasMaxLength(70)
                         .HasColumnType("nvarchar(70)");
 
-                    b.Property<Guid>("CategoryId")
+                    b.Property<Guid?>("CategoryId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Color")
@@ -65,21 +64,20 @@ namespace Jaysbe.Migrations
                         .HasPrecision(16, 2)
                         .HasColumnType("decimal(16,2)");
 
-                    b.Property<int>("ItemNumber")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(70)
                         .HasColumnType("nvarchar(70)");
 
                     b.Property<string>("PicturesUrls")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
                         .HasPrecision(16, 2)
                         .HasColumnType("decimal(16,2)");
+
+                    b.Property<long>("ProductNumber")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -89,20 +87,17 @@ namespace Jaysbe.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.HasKey("ItemId");
+                    b.HasKey("ProductId");
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Items");
+                    b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("Jaysbe.Models.ItemDescOption", b =>
+            modelBuilder.Entity("Jaysbe.Models.ProductDescOption", b =>
                 {
-                    b.Property<Guid>("ItemDescOptionId")
+                    b.Property<Guid?>("ProductDescOptionId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("ItemId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
@@ -115,16 +110,19 @@ namespace Jaysbe.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.HasKey("ItemDescOptionId");
+                    b.Property<Guid?>("ProductId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.HasIndex("ItemId");
+                    b.HasKey("ProductDescOptionId");
 
-                    b.ToTable("ItemDescOption");
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductDescOption");
                 });
 
             modelBuilder.Entity("Jaysbe.Models.SubCategory", b =>
                 {
-                    b.Property<Guid>("SubCategoryId")
+                    b.Property<Guid?>("SubCategoryId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -143,22 +141,20 @@ namespace Jaysbe.Migrations
                     b.ToTable("SubCategories");
                 });
 
-            modelBuilder.Entity("Jaysbe.Models.Item", b =>
+            modelBuilder.Entity("Jaysbe.Models.Product", b =>
                 {
                     b.HasOne("Jaysbe.Models.Category", "Category")
                         .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CategoryId");
 
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("Jaysbe.Models.ItemDescOption", b =>
+            modelBuilder.Entity("Jaysbe.Models.ProductDescOption", b =>
                 {
-                    b.HasOne("Jaysbe.Models.Item", null)
-                        .WithMany("ItemDescriptions")
-                        .HasForeignKey("ItemId");
+                    b.HasOne("Jaysbe.Models.Product", null)
+                        .WithMany("ProductDescriptions")
+                        .HasForeignKey("ProductId");
                 });
 
             modelBuilder.Entity("Jaysbe.Models.SubCategory", b =>
@@ -173,9 +169,9 @@ namespace Jaysbe.Migrations
                     b.Navigation("SubCategories");
                 });
 
-            modelBuilder.Entity("Jaysbe.Models.Item", b =>
+            modelBuilder.Entity("Jaysbe.Models.Product", b =>
                 {
-                    b.Navigation("ItemDescriptions");
+                    b.Navigation("ProductDescriptions");
                 });
 #pragma warning restore 612, 618
         }
