@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Jaysbe.Data;
+using Jaysbe.Infrastucture;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +18,9 @@ builder.Services.AddSwaggerGen();
 var connectionStr = builder.Configuration["ConnectionString"];
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionStr));
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -30,6 +34,8 @@ app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseAuthorization();
+
+app.UseExceptionHandler();
 
 app.MapControllers();
 
