@@ -1,9 +1,11 @@
 ﻿using Jaysbe.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Jaysbe.Data;
 
-public class AppDbContext : DbContext
+public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string>
 {
     public DbSet<Product>? Products { get; set; }
     public DbSet<Category>? Categories { get; set; }
