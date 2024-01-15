@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using Jaysbe.Data;
 using Jaysbe.Infrastucture;
 using Jaysbe.Services.Authentication;
+using Jaysbe.Services.File;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -54,6 +55,7 @@ void AddServices()
     
     builder.Services.AddScoped<IAuthService, AuthService>();
     builder.Services.AddScoped<ITokenService, TokenService>();
+    builder.Services.AddScoped<IImageUploadHandler, ImageUploadHandler>();
     builder.Services.AddAutoMapper(typeof(Program).Assembly);
     
     builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
