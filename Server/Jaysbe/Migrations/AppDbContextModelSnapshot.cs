@@ -76,7 +76,7 @@ namespace Jaysbe.Migrations
                         .HasPrecision(16, 2)
                         .HasColumnType("decimal(16,2)");
 
-                    b.Property<long>("ProductNumber")
+                    b.Property<long?>("ProductNumber")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("bigint");
 
@@ -100,6 +100,11 @@ namespace Jaysbe.Migrations
                     b.Property<Guid?>("ProductDescOptionId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("DescType")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<string>("Name")
                         .IsRequired()

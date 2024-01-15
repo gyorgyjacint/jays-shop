@@ -10,7 +10,7 @@ public class Product
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid? ProductId { get; init; }
     [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-    public uint ProductNumber { get; set; }
+    public uint? ProductNumber { get; set; }
     
     [MaxLength(70)]
     public string Name { get; set; }

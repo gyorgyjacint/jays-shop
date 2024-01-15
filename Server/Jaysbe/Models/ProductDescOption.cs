@@ -10,6 +10,8 @@ public record ProductDescOption
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid? ProductDescOptionId { get; init; }
     
+    [MaxLength(30)]
+    public string DescType { get; set; }
     [MaxLength(70)]
     public string Name { get; set; }
     [MaxLength(150)]
