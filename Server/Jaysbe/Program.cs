@@ -32,6 +32,8 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseStaticFiles();
+
 app.UseExceptionHandler();
 
 app.MapControllers();
@@ -43,15 +45,17 @@ app.Run();
 
 void AddServices()
 {
-    builder.Services.AddScoped<IAuthService, AuthService>();
-    builder.Services.AddScoped<ITokenService, TokenService>();
-    
     builder.Services.AddControllers()
         .AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
         });
     builder.Services.AddEndpointsApiExplorer();
+    
+    builder.Services.AddScoped<IAuthService, AuthService>();
+    builder.Services.AddScoped<ITokenService, TokenService>();
+    builder.Services.AddAutoMapper(typeof(Program).Assembly);
+    
     builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
     builder.Services.AddProblemDetails();
 }
@@ -149,12 +153,12 @@ void AddRoles()
 
 async Task CreateAdminRole(RoleManager<IdentityRole> roleManager)
 {
-    await roleManager.CreateAsync(new IdentityRole("Admin")); //The role string should better be stored as a constant or a value in appsettings
+    await roleManager.CreateAsync(new IdentityRole("Admin"));
 }
 
 async Task CreateUserRole(RoleManager<IdentityRole> roleManager)
 {
-    await roleManager.CreateAsync(new IdentityRole("User")); //The role string should better be stored as a constant or a value in appsettings
+    await roleManager.CreateAsync(new IdentityRole("User"));
 }
 
 void AddAdmin()
@@ -167,7 +171,7 @@ async Task CreateAdminIfNotExists()
 {
     using var scope = app.Services.CreateScope();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-    var adminInDb = await userManager.FindByEmailAsync("admin@admin.com");
+    var adminInDb = await userManager.FindByEmailAsync(builder.Configuration["AdminEmail"]);
     if (adminInDb == null)
     {
         var admin = new IdentityUser { UserName = "admin", Email = builder.Configuration["AdminEmail"] };
