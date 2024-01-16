@@ -29,18 +29,22 @@
         <Link>.dockerignore</Link>
       </Content>
       <Content Remove="Pics\**" />
+      <Content Remove="Uploads\**" />
     </ItemGroup>
 
     <ItemGroup>
       <Compile Remove="Pics\**" />
+      <Compile Remove="Uploads\**" />
     </ItemGroup>
 
     <ItemGroup>
       <EmbeddedResource Remove="Pics\**" />
+      <EmbeddedResource Remove="Uploads\**" />
     </ItemGroup>
 
     <ItemGroup>
       <None Remove="Pics\**" />
+      <None Remove="Uploads\**" />
     </ItemGroup>
 
 </Project>

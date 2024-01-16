@@ -31,7 +31,7 @@ public class ProductController : ControllerBase
         _logger.LogInformation($"{nameof(Post)}, {product.Name}");
         var mappedProduct = _mapper.Map<Product>(product);
         
-        var thumbnailResult = await _imageUploadHandler.AddImageAsync(product.Thumbnail);
+        var thumbnailResult = await _imageUploadHandler.AddImageAsync(product.Thumbnail, ModelState);
         if (!thumbnailResult.isSuccessful)
         {
             return BadRequest(thumbnailResult.errorMessages);
@@ -41,7 +41,7 @@ public class ProductController : ControllerBase
 
         if (product.Pictures != null)
         {
-            var picsResult = await _imageUploadHandler.AddImagesAsync(product.Pictures);
+            var picsResult = await _imageUploadHandler.AddImagesAsync(product.Pictures, ModelState);
             if (picsResult.paths.Any())
             {
                 mappedProduct.PicturesUrls = (IList<string>?)picsResult.paths;
