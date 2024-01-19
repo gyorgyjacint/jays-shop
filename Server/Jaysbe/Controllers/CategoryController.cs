@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Jaysbe.Controllers;
 
 [ApiController]
-[Route("[controller]/[action]")]
+[Route("api/[controller]/[action]")]
 public class CategoryController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -24,11 +24,11 @@ public class CategoryController : ControllerBase
     {
         _logger.LogInformation($"{nameof(Post)}, called.");
         
-        var entity = await _context.Categories.AddAsync(category);
+        await _context.Categories.AddAsync(category);
         await _context.SaveChangesAsync();
 
         _logger.LogInformation($"{nameof(Post)}, Category entity added to database.");
-        return Ok();
+        return Created();
     }
 
     [HttpGet]

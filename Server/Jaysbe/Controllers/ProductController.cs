@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Jaysbe.Controllers;
 
 [ApiController]
-[Route("[controller]/[action]")]
+[Route("api/[controller]/[action]")]
 public class ProductController : ControllerBase
 {
     private readonly AppDbContext _context;
