@@ -9,10 +9,12 @@ namespace Jaysbe.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
+    private readonly IConfiguration _configuration;
 
-    public AuthController(IAuthService authenticationService)
+    public AuthController(IAuthService authenticationService, IConfiguration configuration)
     {
         _authService = authenticationService;
+        _configuration = configuration;
     }
 
     [HttpPost]
@@ -49,5 +51,25 @@ public class AuthController : ControllerBase
         {
             ModelState.AddModelError(error.Key, error.Value);
         }
+    }
+    
+    [HttpPost]
+    public async Task<ActionResult<AuthResponse>> AuthenticateAdmin([FromBody] AuthRequest request)
+    {
+        if (request.Email != _configuration["AdminEmail"])
+        {
+            ModelState.AddModelError("auth-error", "Unauthorized");
+            return Unauthorized(ModelState);
+        }
+        
+        var result = await _authService.LoginAsync(request.Email, request.Password);
+        
+        if (!result.Success)
+        {
+            AddErrors(result);
+            return BadRequest(ModelState);
+        }
+        
+        return Ok(new AuthResponse(result.Email, result.Username, result.Token));
     }
 }
