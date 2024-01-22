@@ -107,6 +107,10 @@ void AddAuthentication()
     var issuerSigningKey = builder.Configuration["IssuerSigningKey"];
 
     builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddCookie(options =>
+        {
+            options.Cookie.Name = "Authorization";
+        })
         .AddJwtBearer(options =>
         {
             options.TokenValidationParameters = new TokenValidationParameters()
@@ -121,6 +125,14 @@ void AddAuthentication()
                 IssuerSigningKey = new SymmetricSecurityKey(
                     Encoding.UTF8.GetBytes(issuerSigningKey ?? throw new InvalidOperationException($"{nameof(issuerSigningKey)} is null"))
                 ),
+            };
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    context.Token = context.Request.Cookies["Authorization"];
+                    return Task.CompletedTask;
+                }
             };
         });
 }
