@@ -55,8 +55,9 @@ public class ImageUploadHandler : IImageUploadHandler
 
         var maxFileSize = Int32.Parse(_configuration["MaxImageSizeBytes"] ??
                                       throw new NullReferenceException("MaxImageSizeBytes not found in configuration"));
-        var path = _configuration["ProductImageUploadPath"] ??
-                   throw new NullReferenceException("ProductImageUploadPath not found in configuration");
+        var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+            _configuration["ProductImageUploadPath"] ??
+            throw new NullReferenceException("ProductImageUploadPath not found in configuration"));
 
         var processedFormFile =
             await ProcessFormFile<FormFile>(formFile, modelState, allowedImageExtensions, maxFileSize);
@@ -76,7 +77,9 @@ public class ImageUploadHandler : IImageUploadHandler
         if (!Directory.Exists(path))
             Directory.CreateDirectory(path);
 
-        var filePath = Path.Combine(path, Guid.NewGuid() + extension);
+        var newFileName = Guid.NewGuid() + extension;
+        var filePath = Path.Combine(path, newFileName);
+        var imageRoute = Path.Combine(_configuration["ImageAccessRoute"]!, newFileName);
 
         await using (var stream = System.IO.File.Create(filePath))
         {
@@ -85,7 +88,7 @@ public class ImageUploadHandler : IImageUploadHandler
                 $"{nameof(AddImageAsync)} uploaded file [{trustedFileNameForDisplay}] as ({Path.GetFileName(filePath)}).");
         }
 
-        return (filePath, true, null);
+        return (imageRoute, true, null);
     }
 
     public async Task<(IEnumerable<string> paths, bool isSuccessful, string[]? errorMessages)> AddImagesAsync(
