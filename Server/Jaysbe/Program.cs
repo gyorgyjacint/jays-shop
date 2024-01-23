@@ -7,10 +7,20 @@ using Jaysbe.Services.File;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var imagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+    builder.Configuration["ProductImageUploadPath"] ??
+    throw new NullReferenceException("ProductImageUploadPath is not found in configuration"));
+var imageAccessRoute = builder.Configuration["ImageAccessRoute"] ??
+                       throw new NullReferenceException("ImageAccessRoute is not found in configuration");
+
+if (!Directory.Exists(imagePath))
+    Directory.CreateDirectory(imagePath);
 
 AddServices();
 ConfigureSwagger();
@@ -33,7 +43,11 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(imagePath),
+    RequestPath = imageAccessRoute 
+});
 
 app.UseExceptionHandler();
 
@@ -52,12 +66,12 @@ void AddServices()
             options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
         });
     builder.Services.AddEndpointsApiExplorer();
-    
+
     builder.Services.AddScoped<IAuthService, AuthService>();
     builder.Services.AddScoped<ITokenService, TokenService>();
     builder.Services.AddScoped<IImageUploadHandler, ImageUploadHandler>();
     builder.Services.AddAutoMapper(typeof(Program).Assembly);
-    
+
     builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
     builder.Services.AddProblemDetails();
 }
@@ -83,11 +97,11 @@ void ConfigureSwagger()
                 {
                     Reference = new OpenApiReference
                     {
-                        Type=ReferenceType.SecurityScheme,
-                        Id="Bearer"
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
                     }
                 },
-                new string[]{}
+                new string[] { }
             }
         });
     });
@@ -123,7 +137,8 @@ void AddAuthentication()
                 ValidIssuer = issueAudience,
                 ValidAudience = issueAudience,
                 IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(issuerSigningKey ?? throw new InvalidOperationException($"{nameof(issuerSigningKey)} is null"))
+                    Encoding.UTF8.GetBytes(issuerSigningKey ??
+                                           throw new InvalidOperationException($"{nameof(issuerSigningKey)} is null"))
                 ),
             };
             options.Events = new JwtBearerEvents
