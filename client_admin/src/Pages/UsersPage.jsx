@@ -26,11 +26,7 @@ export default function Users(){
     }, []);
 
     if (loading) {
-        return (
-        <Container maxWidth="lg">
-            <Loading />
-        </Container>
-        );
+        return <Loading />;
     }
 
     return (
