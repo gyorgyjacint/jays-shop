@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import fetchDataAsync from "../Services/fetchDataAsync";
 import Loading from "../Components/Loading";
-import { Box, Container } from "@mui/material";
+import { Box } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 
 export default function Users(){
@@ -9,12 +9,12 @@ export default function Users(){
     const [loading, setLoading] = useState(true);
 
     const columns = [
-        { field: "id", headerName: "ID", width: 300 },
-        { field: "userName", headerName: "Username", width: 150 },
-        { field: "email", headerName: "Email", width: 170 },
-        { field: "emailConfirmed", headerName: "Email confirmed", width: 150 },
-        { field: "phoneNumber", headerName: "Phone number", width: 200 },
-        { field: "phoneNumberConfirmed", headerName: "Phone number confirmed", width: 200 }
+        { field: "id", headerName: "ID", flex: 1 },
+        { field: "userName", headerName: "Username", flex: 1 },
+        { field: "email", headerName: "Email", flex: 1 },
+        { field: "emailConfirmed", headerName: "Email confirmed", flex: 1 },
+        { field: "phoneNumber", headerName: "Phone number", flex: 1 },
+        { field: "phoneNumberConfirmed", headerName: "Phone number confirmed", flex: 1 }
     ];
 
     useEffect(() => {
