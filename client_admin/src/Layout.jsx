@@ -1,4 +1,4 @@
-import { Alert, Button, Container } from "@mui/material";
+import { Alert, Box, Button, Container } from "@mui/material";
 import { useEffect, useState } from "react";
 import isLoggedIn from "./Services/isLoggedIn";
 import fetchDataAsync from "./Services/fetchDataAsync";
@@ -8,6 +8,16 @@ export default function Layout()
     const [serverStatus, setServerStatus] = useState(true);
     const [loggedIn, setLoggedIn] = useState(true);
     const [mutation, setMutation] = useState(true);
+
+    const containerStyle = {
+        maxWidth: "90%",
+        margin: "auto",
+        marginTop: "15px",
+        marginBottom: "15px",
+        display: "flex",
+        gap: "8px",
+        justifyContent:"center"
+    }
 
     const observer = new MutationObserver((mutationsList) => {
         setMutation(!mutation);
@@ -34,26 +44,24 @@ export default function Layout()
         return <Alert severity="error">Server is down.</Alert>;
     }
 
-    function fetchDummyAuth2() {
-        fetch("/api/dummy/dummyauth2");
-    }
-
     const handleHomeBtn = () => { window.location.replace("/home") }
     const handleUsersBtn = () => { window.location.replace("/users") }
     const handleProductsBtn = () => { window.location.replace("/products") }
     const handleOrdersBtn = () => { window.location.replace("/orders"); }
 
     return (
-        <div>
+        <Box backgroundColor="lightslategrey" sx={{display: "flex"}}>
             {loggedIn && 
-                <Container color="lightblue">
-                    <Button variant="contained" onClick={handleHomeBtn}>Home</Button>
+            <>
+                <Button variant="text" onClick={handleHomeBtn} sx={{fontSize: "15px", fontWeight: "900", position: "fixed", color: "blue"}}>Home</Button>
+                <Container color="lightblue" sx={containerStyle}>
                     <Button variant="contained" onClick={handleUsersBtn}>Users</Button>
                     <Button variant="contained" onClick={handleProductsBtn}>Products</Button>
                     <Button variant="contained" onClick={handleOrdersBtn}>Orders</Button>
                 </Container>
+            </>
             }
             {!serverStatus && <Alert severity="error">Server is down.</Alert>}
-        </div>
+        </Box>
     );
 }
