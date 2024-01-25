@@ -60,4 +60,21 @@ public class ProductController : ControllerBase
         var item = await _context.Products.FirstAsync();
         return item;
     }
+    
+    [HttpGet]
+    public async Task<Product[]> GetAll()
+    {
+        _logger.LogInformation(nameof(GetAll));
+
+        if (_context.Products == null)
+        {
+            _logger.LogInformation($"{nameof(GetAll)}: no products found");
+            return Array.Empty<Product>();
+        }
+        
+        var products = await _context.Products.ToArrayAsync();
+        _logger.LogInformation($"{nameof(GetAll)}: {products.Length} products found");
+        
+        return products;
+    }
 }
