@@ -17,23 +17,27 @@ public class ProductController : ControllerBase
     private readonly IMapper _mapper;
     private readonly IImageUploadHandler _imageUploadHandler;
 
-    public ProductController(AppDbContext context, IMapper mapper, IImageUploadHandler imageUploadHandler, ILogger<ProductController> logger)
+    public ProductController(AppDbContext context, IMapper mapper, IImageUploadHandler imageUploadHandler,
+        ILogger<ProductController> logger)
     {
         _context = context;
         _logger = logger;
         _mapper = mapper;
         _imageUploadHandler = imageUploadHandler;
     }
-    
+
     [HttpPost]
-    public async Task<IActionResult> Post([FromForm]ProductRequest product)
+    public async Task<IActionResult> Post([FromForm] ProductRequest product)
     {
-        _logger.LogInformation($"{nameof(Post)}, {product.Name}");
+        _logger.LogInformation(nameof(Post));
+        _logger.LogInformation($"Attempt to register product [{product.Name}]");
         var mappedProduct = _mapper.Map<Product>(product);
-        
+
         var thumbnailResult = await _imageUploadHandler.AddImageAsync(product.Thumbnail, ModelState);
         if (!thumbnailResult.isSuccessful)
         {
+            _logger.LogInformation(
+                $"Register of product [{product.Name}] is unsuccessful, {nameof(thumbnailResult.isSuccessful)} is false");
             return BadRequest(thumbnailResult.errorMessages);
         }
 
@@ -46,21 +50,23 @@ public class ProductController : ControllerBase
             {
                 mappedProduct.PicturesUrls = (IList<string>?)picsResult.paths;
             }
+            _logger.LogInformation($"Saved [{picsResult.paths.Count()}] out of {product.Pictures.Count} images");
         }
-        
+
         await _context.Products.AddAsync(mappedProduct);
-        _logger.LogInformation($"{mappedProduct.Name} product added to database");
         await _context.SaveChangesAsync();
+        _logger.LogInformation($"{mappedProduct.Name} product added to database");
         return Created("name", mappedProduct.Name);
     }
 
     [HttpGet]
     public async Task<Product> GetFirst()
     {
+        _logger.LogInformation(nameof(GetFirst));
         var item = await _context.Products.FirstAsync();
         return item;
     }
-    
+
     [HttpGet]
     public async Task<Product[]> GetAll()
     {
@@ -71,10 +77,10 @@ public class ProductController : ControllerBase
             _logger.LogInformation($"{nameof(GetAll)}: no products found");
             return Array.Empty<Product>();
         }
-        
+
         var products = await _context.Products.ToArrayAsync();
         _logger.LogInformation($"{nameof(GetAll)}: {products.Length} products found");
-        
+
         return products;
     }
 }

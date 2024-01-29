@@ -22,7 +22,7 @@ public class CategoryController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Post(Category category)
     {
-        _logger.LogInformation($"{nameof(Post)}, called.");
+        _logger.LogInformation(nameof(Post));
         
         await _context.Categories.AddAsync(category);
         await _context.SaveChangesAsync();
@@ -34,6 +34,7 @@ public class CategoryController : ControllerBase
     [HttpGet]
     public async Task<Category> GetFirst()
     {
+        _logger.LogInformation(nameof(GetFirst));
         var item = await _context.Categories.FirstAsync();
         return item;
     }

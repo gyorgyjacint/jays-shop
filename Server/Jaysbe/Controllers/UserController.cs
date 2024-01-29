@@ -31,6 +31,7 @@ public class UserController : ControllerBase
         
         var users = await identityUsers.Select(u => _mapper.Map<User<Guid>>(u)).ToArrayAsync();
         
+        _logger.LogInformation($"Users found: [{users.Length}]");
         return users;
     }
 }

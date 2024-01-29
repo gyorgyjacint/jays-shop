@@ -28,9 +28,11 @@ public class AuthController : ControllerBase
         if (!result.Success)
         {
             AddErrors(result);
+            _logger.LogInformation($"Registration failed: [{request.Email}]");
             return BadRequest(ModelState);
         }
 
+        _logger.LogInformation($"Registered user: [{request.Email}]");
         return CreatedAtAction(nameof(Register), new RegistrationResponse(result.Email, result.Username));
     }
     
@@ -43,6 +45,7 @@ public class AuthController : ControllerBase
         if (!result.Success)
         {
             AddErrors(result);
+            LogUnauthorized(request.Email);
             return BadRequest(ModelState);
         }
 
@@ -54,17 +57,11 @@ public class AuthController : ControllerBase
                 HttpOnly = true
             }
         );
+        
+        LogAuthorized(request.Email);
         return Ok(new AuthResponse(result.Email, result.Username, null));
     }
-    
-    private void AddErrors(AuthResult result)
-    {
-        foreach (var error in result.ErrorMessages)
-        {
-            ModelState.AddModelError(error.Key, error.Value);
-        }
-    }
-    
+
     [HttpPost]
     public async Task<ActionResult<AuthResponse>> AuthenticateAdmin([FromBody] AuthRequest request)
     {
@@ -72,6 +69,7 @@ public class AuthController : ControllerBase
         if (request.Email != _configuration["AdminEmail"])
         {
             ModelState.AddModelError("auth-error", "Unauthorized");
+            LogUnauthorized(request.Email);
             return Unauthorized(ModelState);
         }
         
@@ -80,6 +78,7 @@ public class AuthController : ControllerBase
         if (!result.Success)
         {
             AddErrors(result);
+            LogUnauthorized(request.Email);
             return BadRequest(ModelState);
         }
 
@@ -91,6 +90,28 @@ public class AuthController : ControllerBase
                 HttpOnly = true
             }
         );
+        
+        LogAuthorized(request.Email);
+        
         return Ok(new AuthResponse(result.Email, result.Username, null));
     }
+
+    private void AddErrors(AuthResult result)
+    {
+        foreach (var error in result.ErrorMessages)
+        {
+            ModelState.AddModelError(error.Key, error.Value);
+        }
+    }
+
+    private void LogAuthorized(string email)
+    {
+        _logger.LogInformation($"[{email}] Successfully authorized");
+    }
+    
+    private void LogUnauthorized(string email)
+    {
+        _logger.LogInformation($"[{email}] Unauthorized");
+    }
+
 }
