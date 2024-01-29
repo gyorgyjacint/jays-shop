@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Jaysbe.Contracts;
 
-public class ProductRequest
+public class ProductRequestDto
 {
     [MaxLength(70)]
     public string Name { get; set; }

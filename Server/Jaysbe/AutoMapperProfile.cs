@@ -10,8 +10,8 @@ public class AutoMapperProfile : Profile
 {
     public AutoMapperProfile()
     {
-        CreateMap<ProductRequest, Product>().ReverseMap();
-        CreateMap<Product, ProductResponse>();
-        CreateMap<IdentityUser, User<Guid>>();
+        CreateMap<ProductRequestDto, Product>().ReverseMap();
+        CreateMap<Product, ProductResponseDto>();
+        CreateMap<IdentityUser, UserDto<Guid>>();
     }
 }

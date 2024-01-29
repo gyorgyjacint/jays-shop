@@ -2,7 +2,7 @@
 
 namespace Jaysbe.Dtos;
 
-public class User<TKey> where TKey : IEquatable<TKey>
+public class UserDto<TKey> where TKey : IEquatable<TKey>
 {
     [PersonalData] 
     public virtual TKey Id { get; set; } = default!;

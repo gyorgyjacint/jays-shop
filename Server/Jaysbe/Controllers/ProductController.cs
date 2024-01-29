@@ -27,7 +27,7 @@ public class ProductController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post([FromForm] ProductRequest product)
+    public async Task<IActionResult> Post([FromForm] ProductRequestDto product)
     {
         _logger.LogInformation(nameof(Post));
         _logger.LogInformation($"Attempt to register product [{product.Name}]");

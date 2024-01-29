@@ -2,7 +2,7 @@
 
 namespace Jaysbe.Contracts;
 
-public class ProductResponse
+public class ProductResponseDto
 {
     public Guid? ProductId { get; init; }
     public uint? ProductNumber { get; set; }

@@ -24,12 +24,12 @@ public class UserController : ControllerBase
 
     [Authorize(Roles = "Admin")]
     [HttpGet]
-    public async Task<User<Guid>[]> GetAll()
+    public async Task<UserDto<Guid>[]> GetAll()
     {
         _logger.LogInformation(nameof(GetAll));
         var identityUsers = _context.Users;
         
-        var users = await identityUsers.Select(u => _mapper.Map<User<Guid>>(u)).ToArrayAsync();
+        var users = await identityUsers.Select(u => _mapper.Map<UserDto<Guid>>(u)).ToArrayAsync();
         
         _logger.LogInformation($"Users found: [{users.Length}]");
         return users;
