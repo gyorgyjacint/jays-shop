@@ -30,7 +30,6 @@ AddIdentity();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -67,9 +66,9 @@ void AddServices()
         });
     builder.Services.AddEndpointsApiExplorer();
 
-    builder.Services.AddScoped<IAuthService, AuthService>();
-    builder.Services.AddScoped<ITokenService, TokenService>();
-    builder.Services.AddScoped<IImageUploadHandler, ImageUploadHandler>();
+    builder.Services.AddTransient<IAuthService, AuthService>();
+    builder.Services.AddTransient<ITokenService, TokenService>();
+    builder.Services.AddTransient<IImageUploadHandler, ImageUploadHandler>();
     builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
     builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
