@@ -69,4 +69,32 @@ public class UserController : ControllerBase
         
         return Ok(user.Id);
     }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPatch]
+    public async Task<IActionResult> Update([FromBody]UserDto<Guid> user)
+    {
+        _logger.LogInformation(nameof(Update));
+        var identityUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == user.Id.ToString());
+        
+        if (identityUser is null)
+        {
+            _logger.LogInformation($"{nameof(user)} is null");
+            return NotFound();
+        }
+
+        identityUser.UserName = user.UserName;
+        identityUser.NormalizedUserName = user.UserName?.ToUpper();
+        identityUser.Email = user.Email;
+        identityUser.NormalizedEmail = user.Email?.ToUpper();
+        identityUser.EmailConfirmed = user.EmailConfirmed;
+        identityUser.PhoneNumber = user.PhoneNumber;
+        identityUser.PhoneNumberConfirmed = user.PhoneNumberConfirmed;
+        identityUser.SecurityStamp = Guid.NewGuid().ToString();
+
+        await _context.SaveChangesAsync();
+        _logger.LogInformation($"User [{identityUser.Id}] updated");
+
+        return Ok(identityUser.Id);
+    }
 }
