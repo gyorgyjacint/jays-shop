@@ -1,86 +1,251 @@
 import { useEffect, useState } from "react";
 import fetchDataAsync from "../Services/fetchDataAsync";
 import Loading from "../Components/Loading";
-import { Box, Button, Dialog, DialogActions, DialogTitle, PopoverRoot } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import SaveIcon from '@mui/icons-material/Save';
+import CancelIcon from '@mui/icons-material/Close';
+import {
+  GridRowModes,
+  DataGrid,
+  GridToolbarContainer,
+  GridActionsCellItem,
+  GridRowEditStopReasons,
+} from '@mui/x-data-grid';
+import { Snackbar, SnackbarContent } from "@mui/material";
 
-export default function Users(){
-    const [users, setUsers] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [showDeletePopup, setShowDeletePopup] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(null);
+function EditToolbar(props) {
+  const { setRows, setRowModesModel } = props;
 
-    const columns = [
-        { field: "userName", headerName: "Username", flex: 1 },
-        { field: "email", headerName: "Email", flex: 1 },
-        { field: "emailConfirmed", headerName: "Email confirmed", flex: 1 },
-        { field: "phoneNumber", headerName: "Phone number", flex: 1 },
-        { field: "phoneNumberConfirmed", headerName: "Phone number confirmed", flex: 1 },
-        {
-            field: "action",
-            headerName: "Action",
-            renderCell: (params) => {
-                const onClick = (e) => {
-                    e.preventDefault();
-                    setSelectedUser(params.row);
-                    setShowDeletePopup(true);
-                }
+  const handleClick = () => {
+    //TODO
+    const id = 0;
+    setRows((oldRows) => [...oldRows, { id, name: '', age: '', isNew: true }]);
+    setRowModesModel((oldModel) => ({
+      ...oldModel,
+      [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
+    }));
+  };
 
-                if (params.row.userName.toLowerCase().includes("admin")) {
-                    return undefined;
-                }
+  return (
+    <GridToolbarContainer>
+      <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
+        Add record
+      </Button>
+    </GridToolbarContainer>
+  );
+}
 
-                return <Button sx={{color: "red"}} onClick={onClick}>Delete</Button>
-            }
-        }
-    ];
+export default function UsersPage() {
+  const [users, setUsers] = useState([]);
+  const [rowModesModel, setRowModesModel] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [showSnackBar, setShowSnackBar] = useState(false);
 
-    useEffect(() => {
-        fetchDataAsync("/api/user/getall")
-        .then(p => {
-            setUsers(p);
-            setLoading(false);
-        })
-    }, []);
+  useEffect(() => {
+    setLoading(true);
+    fetchDataAsync("api/user/getall")
+    .then(data => {
+      setUsers(data);
+      setLoading(false);
+    })
+  }, []);
 
-    const handleDelete = () => {
-        const result = fetchDataAsync(`/api/user/delete/${selectedUser.id}`);
-        if (result) {
-            setShowDeletePopup(false);
-            const newUsers = users.filter(u => u.id !== selectedUser.id);
-            setSelectedUser(null);
-            setUsers(newUsers);
-        }
+  const handleRowEditStop = (params, event) => {
+    if (params.reason === GridRowEditStopReasons.rowFocusOut) {
+      event.defaultMuiPrevented = true;
     }
+  };
 
-    if (loading) {
-        return <Loading />;
+  const handleEditClick = (id) => () => {
+    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
+  };
+
+  const handleSaveClick = (id) => () => {
+    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
+  };
+
+  const handleDeleteClick = (id) => () => {
+    //TODO
+    setUsers(users.filter((row) => row.id !== id));
+  };
+
+  const handleCancelClick = (id) => () => {
+    setRowModesModel({
+      ...rowModesModel,
+      [id]: { mode: GridRowModes.View, ignoreModifications: true },
+    });
+
+    const editedRow = users.find((row) => row.id === id);
+    if (editedRow.isNew) {
+      setUsers(users.filter((row) => row.id !== id));
     }
+  };
 
-    return (
-    <Box maxWidth={"90%"} margin="auto" marginTop="30px" display="flex" justifyContent="center" justifyItems="center" justifySelf="center">
-        <DataGrid
-            rows={users}
-            columns={columns}
-            getRowId={(row) => row.id}
-            initialState={{
-                pagination: {
-                    paginationModel: {page: 0, pageSize: 15}
-                }
-            }}
-            pageSizeOptions={[5, 10, 15, 25, 50, 100]}
+  const processRowUpdate = (newRow) => {
+    const updatedRow = { ...newRow, isNew: false };
+    return fetchDataAsync("api/user/update", "PATCH", JSON.stringify(newRow), {"Content-Type": "application/json"})
+    .then(id => {
+      console.log(id)
+      console.log(newRow)
+      if (id === newRow.id){
+        setUsers(users.map((row) => (row.id === newRow.id ? updatedRow : row)));
+        return updatedRow;
+      } else {
+        setShowSnackBar(true);
+      }
+    })
+  };
+
+  const handleRowModesModelChange = (newRowModesModel) => {
+    setRowModesModel(newRowModesModel);
+  };
+
+  const columns = [
+    { field: 'userName', headerName: 'Username', width: 180, editable: true },
+    {
+      field: 'email',
+      headerName: 'Email',
+      type: 'email',
+      width: 180,
+      align: 'left',
+      headerAlign: 'left',
+      editable: true,
+      flex: 1
+    },
+    {
+      field: 'emailConfirmed',
+      headerName: 'Email confirmed',
+      type: 'boolean',
+      width: 180,
+      editable: true,
+      flex: 1
+    },
+    {
+      field: 'phoneNumber',
+      headerName: 'Phone number',
+      width: 250,
+      editable: true,
+      type: 'string',
+      flex: 1
+    },
+    {
+      field: 'phoneNumberConfirmed',
+      headerName: 'Phone number confirmed',
+      width: 180,
+      editable: true,
+      type: 'boolean',
+      flex: 1
+    },
+    {
+      field: 'actions',
+      type: 'actions',
+      headerName: 'Actions',
+      width: 100,
+      flex: 1,
+      cellClassName: 'actions',
+      getActions: (params) => {
+        const isInEditMode = rowModesModel[params.id]?.mode === GridRowModes.Edit;
+
+        if (isInEditMode) {
+          return [
+            <GridActionsCellItem
+              icon={<SaveIcon />}
+              label="Save"
+              sx={{
+                color: 'primary.main',
+              }}
+              onClick={handleSaveClick(params.id)}
+            />,
+            <GridActionsCellItem
+              icon={<CancelIcon />}
+              label="Cancel"
+              className="textPrimary"
+              onClick={handleCancelClick(params.id)}
+              color="inherit"
+            />,
+          ];
+        }
+
+        return [
+          <GridActionsCellItem
+            icon={<EditIcon />}
+            label="Edit"
+            className="textPrimary"
+            onClick={handleEditClick(params.id)}
+            color="inherit"
+          />,
+          <GridActionsCellItem
+            icon={<DeleteIcon />}
+            label="Delete"
+            onClick={handleDeleteClick(params.id)}
+            color="inherit"
+          />,
+        ];
+      },
+    },
+  ];
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  return (
+    <Box  
+      sx={{
+        maxWidth: "90%",
+        height: "fit-content",
+        width: '100%',
+        margin: "auto",
+        marginTop: "10px",
+        display: "flex",
+        justifyContent: "center",
+        justifyItems: "center",
+        justifySelf: "center",
+       '& .actions': {
+          color: 'text.secondary',
+        },
+        '& .textPrimary': {
+          color: 'text.primary',
+        },
+      }}
+    >
+      <DataGrid 
+        rows={users}
+        columns={columns}
+        editMode="row"
+        rowModesModel={rowModesModel}
+        onRowModesModelChange={handleRowModesModelChange}
+        onRowEditStop={handleRowEditStop}
+        processRowUpdate={processRowUpdate}
+        slots={{
+          toolbar: EditToolbar,
+        }}
+        slotProps={{
+          toolbar: { setRows: setUsers, setRowModesModel },
+        }}
+        initialState={{
+          pagination: {
+              paginationModel: {page: 0, pageSize: 15}
+          }
+        }}
+        pageSizeOptions={[5, 10, 15, 25, 50, 100]}
+      />
+      <Snackbar 
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          open={showSnackBar}
+          onClose={() => setShowSnackBar(false)}
+          autoHideDuration={3000}
+          key={"snackbar1"}
+      >
+        <SnackbarContent 
+          style={{backgroundColor: "red", margin: "auto", display:"flex", justifyContent: "center", fontWeight: 530, fontSize: 16}}
+          message={<p>Something went wrong, please try again.</p>}
         />
-        <Dialog
-            open={showDeletePopup}
-        >
-            <DialogTitle id="delete-alert-dialog" sx={ {padding: "30px", paddingBottom: 0, justifyItems: "center", margin: "auto"} }>
-                Delete user?
-            </DialogTitle>
-            <DialogActions sx={ {gap: "25px", padding: "30px"} }>
-                <Button onClick={handleDelete} variant="contained" sx={ {backgroundColor: "red"} }>DELETE</Button>
-                <Button onClick={() => setShowDeletePopup(false)} variant="contained">BACK</Button>
-            </DialogActions>
-        </Dialog>
+      </Snackbar>
     </Box>
-    );
+  );
 }
