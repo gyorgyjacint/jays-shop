@@ -10,7 +10,7 @@ export default function Layout()
     const [mutation, setMutation] = useState(true);
 
     const containerStyle = {
-        maxWidth: "90%",
+        maxWidth: "100%",
         margin: "auto",
         marginTop: "15px",
         marginBottom: "15px",
@@ -26,14 +26,16 @@ export default function Layout()
 
     useEffect(() => {
         isLoggedIn()
-        .then(isOk => {
-            setLoggedIn(isOk);
-            // Component is not part of a Route so useNavigate cannot be used here
-            if (!isOk && window.location.pathname !== "/login") {
+        .then(status => {
+            setLoggedIn(status === 200);
+            if (status === 500) {
+                setServerStatus(false);
+            }
+            if (status !== 200 && window.location.pathname !== "/login") {
                 window.location.replace("/login");
             }
         })
-    }, [mutation, loggedIn]);
+    }, [mutation, loggedIn, serverStatus]);
 
     useEffect(() => {
         fetchDataAsync("/api/authtest/status")
@@ -41,7 +43,7 @@ export default function Layout()
     }, [])
 
     if (!serverStatus){
-        return <Alert severity="error">Server is down.</Alert>;
+        return <Alert severity="error">Server is down. Please refresh or try again later.</Alert>;
     }
 
     const handleHomeBtn = () => { window.location.replace("/home") }
