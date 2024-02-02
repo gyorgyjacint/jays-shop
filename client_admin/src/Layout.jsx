@@ -49,17 +49,26 @@ export default function Layout()
     const handleHomeBtn = () => { window.location.replace("/home") }
     const handleUsersBtn = () => { window.location.replace("/users") }
     const handleProductsBtn = () => { window.location.replace("/products") }
-    const handleOrdersBtn = () => { window.location.replace("/orders"); }
+    const handleOrdersBtn = () => { window.location.replace("/orders") }
+    const handleLogoutBtn = (e) => { 
+        //TODO: how to log out admin (HttpOnly cookie)?
+     }
 
     return (
         <Box backgroundColor="lightslategrey" sx={{display: "flex"}}>
             {loggedIn && 
             <>
-                <Button variant="text" onClick={handleHomeBtn} sx={{fontSize: "15px", fontWeight: "900", position: "fixed", color: "blue"}}>Home</Button>
                 <Container color="lightblue" sx={containerStyle}>
+                    <Button variant="contained" onClick={handleHomeBtn} sx={{fontWeight: 600, position: "absolute", left: "20px"}}>Home</Button>
                     <Button variant="contained" onClick={handleUsersBtn}>Users</Button>
                     <Button variant="contained" onClick={handleProductsBtn}>Products</Button>
                     <Button variant="contained" onClick={handleOrdersBtn}>Orders</Button>
+                    <Button 
+                    style={{fontWeight: 600, position: "absolute", right: "20px"}} 
+                    variant="contained"
+                    onClick={handleLogoutBtn}
+                    >Logout
+                    </Button>
                 </Container>
             </>
             }
