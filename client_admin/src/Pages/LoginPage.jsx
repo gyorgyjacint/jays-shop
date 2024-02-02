@@ -12,30 +12,45 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../Services/Authentication/AuthProvider';
+import isLoggedIn from '../Services/isLoggedIn';
+import { Alert, Backdrop, CircularProgress, Snackbar } from '@mui/material';
+import ErrorIcon from '@mui/icons-material/Error';
 
 const defaultTheme = createTheme();
 
 export default function LoginPage(){
+  const emailKeyLocalStorage = "mail";
   const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const [isLoginInvalid, setIsLoginInvalid] = useState(false);
-  const [email, setEmail] = useState("");
-  const [remember, setRemember] = useState(false);
+  const [showInvalidLoginSnackbar, setShowInvalidLoginSnackbar] = useState(false);
+  const [isRememberMe, setIsRememberMe] = useState(localStorage.getItem(emailKeyLocalStorage) !== null);
+  const [email, setEmail] = useState(localStorage.getItem(emailKeyLocalStorage));
   const navigate = useNavigate();
   const authContext = useAuth();
-
-  const emailKeyLocalStorage = "mail";
 
   useEffect(() => {
     const storedEmail = localStorage.getItem(emailKeyLocalStorage);
     if (storedEmail?.length > 0){
       setEmail(storedEmail);
     }
-  }, [])
+
+    isLoggedIn()
+    .then(statusCode => {
+      if (statusCode === 200){
+        navigate("/home")
+      }
+    });
+  }, [navigate])
 
   const handleSubmit = (event) => {
       event.preventDefault();
       setIsLoggingIn(true);
       const data = new FormData(event.currentTarget);
+      console.log(event.target.validity)
+
+      if (isRememberMe) {
+        localStorage.setItem(emailKeyLocalStorage, data.get("email"))
+      }
+
       const loginData = JSON.stringify({
         email: data.get("email"), 
         password: data.get("password") 
@@ -50,16 +65,16 @@ export default function LoginPage(){
       })
       .then(res => {
         if(res.status !== 200){
-          setIsLoginInvalid(true);
+          setShowInvalidLoginSnackbar(true);
         }
         return res.json();
       })
       .then(data => {
-        authContext.login(data.userName);
-        if (data.token) {
-          setIsLoginInvalid(false);
+        if (data.userName?.length > 0) {
+          authContext.login(data.userName);
+          setShowInvalidLoginSnackbar(false);
+          navigate("/");
         }
-        navigate("/");
       })
       .finally(() => {
         setIsLoggingIn(false);
@@ -67,9 +82,9 @@ export default function LoginPage(){
     };
 
     function handleRememberMe(e){
-      setRemember(e.target.checked);
+      setIsRememberMe(e.target.checked);
       // TODO
-      if (remember){
+      if (e.target.checked){
         localStorage.setItem(emailKeyLocalStorage, email);
       } else {
         localStorage.removeItem(emailKeyLocalStorage);
@@ -77,6 +92,9 @@ export default function LoginPage(){
     }
 
     function handleEmailInput(e){
+      if (isRememberMe) {
+        localStorage.setItem(emailKeyLocalStorage, e.target.value)
+      }
       setEmail(e.target.value);
     }
   
@@ -90,7 +108,6 @@ export default function LoginPage(){
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              
             }}
           >
             <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
@@ -123,10 +140,10 @@ export default function LoginPage(){
                 autoComplete="current-password"
               />
               <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
+                control={<Checkbox defaultChecked={isRememberMe} color="primary" />}
                 label="Remember me"
                 onChange={handleRememberMe}
-                defaultChecked={!!email}
+                defaultChecked={email}
               />
               <Button
                 type="submit"
@@ -142,9 +159,22 @@ export default function LoginPage(){
               </Link>
             </Box>
           </Box>
-          {/*isLoggingIn && */}
+          
+          <Backdrop
+            sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={isLoggingIn}
+          >
+            <CircularProgress color="inherit" />
+          </Backdrop>
+          <Snackbar
+            anchorOrigin={ { vertical: "top", horizontal: "center" } }
+            open={showInvalidLoginSnackbar}
+            onClose={() => setShowInvalidLoginSnackbar(false)}
+            key={"loginpage-snackbar1"}
+          >
+            <Alert  icon={<ErrorIcon />} severity='error'>Bad credentials.</Alert>
+          </Snackbar>
         </Container>
-
       </ThemeProvider>
     );
 }
