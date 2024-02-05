@@ -64,6 +64,7 @@ public class ProductController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<Guid>> Update([FromBody] Product model)
     {
+        _logger.LogInformation(nameof(Update));
         var product = await _context.Products.FindAsync(model.ProductId);
 
         if (product is null)
@@ -72,6 +73,7 @@ public class ProductController : ControllerBase
         _context.Entry(product).CurrentValues.SetValues(model);
         await _context.SaveChangesAsync();
         
+        _logger.LogInformation($"Product with ID [{product.ProductId}] updated");
         return Ok(product.ProductId);
     }
 
