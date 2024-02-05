@@ -8,6 +8,10 @@ export default function Layout()
     const [serverStatus, setServerStatus] = useState(true);
     const [loggedIn, setLoggedIn] = useState(true);
     const [mutation, setMutation] = useState(true);
+    const defaultHeight = 100;
+    const [elementHeight, setElementHeight] = useState(defaultHeight);
+    const layoutId = "layout-main";
+    const pixelsUnderLayout = 30;
 
     const containerStyle = {
         maxWidth: "100%",
@@ -35,7 +39,8 @@ export default function Layout()
                 window.location.replace("/login");
             }
         })
-    }, [mutation, loggedIn, serverStatus]);
+        setElementHeight(document.getElementById(layoutId)?.offsetHeight)
+    }, [mutation]);
 
     useEffect(() => {
         fetchDataAsync("/api/authtest/status")
@@ -55,7 +60,8 @@ export default function Layout()
      }
 
     return (
-        <Box backgroundColor="lightslategrey" sx={{display: "flex"}}>
+        <>
+        <Box id={layoutId} backgroundColor="lightslategrey" sx={{display: "flex", position: "fixed", width: "100%", zIndex: 50}}>
             {loggedIn && 
             <>
                 <Container color="lightblue" sx={containerStyle}>
@@ -74,5 +80,7 @@ export default function Layout()
             }
             {!serverStatus && <Alert severity="error">Server is down.</Alert>}
         </Box>
+        <Box height={elementHeight ? elementHeight + pixelsUnderLayout : defaultHeight} />
+        </>
     );
 }
