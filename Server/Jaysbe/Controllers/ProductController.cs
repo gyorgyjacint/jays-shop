@@ -3,6 +3,7 @@ using Jaysbe.Contracts;
 using Jaysbe.Data;
 using Jaysbe.Models;
 using Jaysbe.Services.File;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -59,12 +60,34 @@ public class ProductController : ControllerBase
         return Created("name", mappedProduct.Name);
     }
 
-    [HttpGet]
-    public async Task<Product> GetFirst()
+    [HttpPatch]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<Guid>> Update([FromBody] Product model)
     {
-        _logger.LogInformation(nameof(GetFirst));
-        var item = await _context.Products.FirstAsync();
-        return item;
+        var product = await _context.Products.FindAsync(model.ProductId);
+
+        if (product is null)
+            return BadRequest();
+
+        _context.Entry(product).CurrentValues.SetValues(model);
+        await _context.SaveChangesAsync();
+        
+        return Ok(product.ProductId);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Product>> GetById(Guid id)
+    {
+        _logger.LogInformation(nameof(GetById));
+        var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductId == id);
+
+        if (product is null)
+        {
+            _logger.LogInformation($"Product with ID: [{id}] not found");
+            return NotFound();
+        }
+        
+        return Ok(product);
     }
 
     [HttpGet]
