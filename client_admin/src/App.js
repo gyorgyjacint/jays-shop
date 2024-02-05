@@ -1,17 +1,17 @@
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 
 import Layout from './Layout';
-import LoginPage from './Pages/LoginPage';
 import ErrorPage from './Pages/ErrorPage';
 import HomePage from './Pages/HomePage';
 
+import LoginPage from './Pages/LoginPage';
+import ImgTest from './Pages/ImgTest';
 
 import './App.css';
 import { AuthProvider } from './Services/Authentication/AuthProvider';
 import Users from './Pages/UsersPage';
 import Products from './Pages/ProductsPage';
-import OrdersPage from './Pages/OrdersPage';
-import ProductUpdatePage from './Pages/ProductUpdatePage';
+import Orders from './Pages/OrdersPage';
 
 function App() {
 
@@ -42,12 +42,14 @@ function App() {
       element: <Products />
     },
     {
-      path: "/update/product/:id",
-      element: <ProductUpdatePage />
+      path: "/orders",
+      element: <Orders />
     },
     {
-      path: "/orders",
-      element: <OrdersPage />
+      path: "/imgtest",
+      element: (
+        <ImgTest />
+      )
     }
   ]);
 
