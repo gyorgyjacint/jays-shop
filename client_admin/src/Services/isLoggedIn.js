@@ -1,6 +1,6 @@
 import fetchDataAsync from "./fetchDataAsync";
 
 export default function isLoggedIn(){
-    return fetchDataAsync("api/AuthTest/AdminAuthorizedStatus")
+    return fetchDataAsync("/api/AuthTest/AdminAuthorizedStatus")
             .then(d => d.status)
 }
