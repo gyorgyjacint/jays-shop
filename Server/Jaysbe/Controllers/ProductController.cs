@@ -60,6 +60,23 @@ public class ProductController : ControllerBase
         return Created("name", mappedProduct.Name);
     }
 
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<Guid>> Delete([FromRoute] Guid id)
+    {
+        _logger.LogInformation(nameof(Delete));
+        var product = await _context.Products.FindAsync(id);
+
+        if (product is null)
+            return BadRequest();
+
+        _context.Remove(product);
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation($"Product with ID [{product.ProductId}] deleted");
+        return Ok(product.ProductId);
+    }
+
     [HttpPatch]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<Guid>> Update([FromBody] Product model)
