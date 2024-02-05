@@ -45,7 +45,6 @@ export default function LoginPage(){
       event.preventDefault();
       setIsLoggingIn(true);
       const data = new FormData(event.currentTarget);
-      console.log(event.target.validity)
 
       if (isRememberMe) {
         localStorage.setItem(emailKeyLocalStorage, data.get("email"))
