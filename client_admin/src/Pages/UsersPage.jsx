@@ -15,13 +15,12 @@ import {
   GridActionsCellItem,
   GridRowEditStopReasons,
 } from '@mui/x-data-grid';
-import { Snackbar, SnackbarContent } from "@mui/material";
+import { Alert, Snackbar, SnackbarContent } from "@mui/material";
 
 function EditToolbar(props) {
   const { setRows, setRowModesModel } = props;
 
   const handleClick = () => {
-    //TODO
     const id = 0;
     setRows((oldRows) => [...oldRows, { id, name: '', age: '', isNew: true }]);
     setRowModesModel((oldModel) => ({
@@ -43,7 +42,8 @@ export default function UsersPage() {
   const [users, setUsers] = useState([]);
   const [rowModesModel, setRowModesModel] = useState({});
   const [loading, setLoading] = useState(true);
-  const [showSnackBar, setShowSnackBar] = useState(false);
+  const [showErrorSnackbar, setShowErrorSnackbar] = useState(false);
+  const [showDeletedSnackbar, setShowDeletedSnackbar] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -69,8 +69,15 @@ export default function UsersPage() {
   };
 
   const handleDeleteClick = (id) => () => {
-    //TODO
-    setUsers(users.filter((row) => row.id !== id));
+    fetchDataAsync(`api/user/delete/${id}`)
+    .then(resId => {
+      if (resId === id) {
+        setUsers(users.filter((row) => row.id !== resId));
+        setShowDeletedSnackbar(true);
+      } else {
+        setShowErrorSnackbar(true);
+      }
+    })
   };
 
   const handleCancelClick = (id) => () => {
@@ -89,13 +96,11 @@ export default function UsersPage() {
     const updatedRow = { ...newRow, isNew: false };
     return fetchDataAsync("api/user/update", "PATCH", JSON.stringify(newRow), {"Content-Type": "application/json"})
     .then(id => {
-      console.log(id)
-      console.log(newRow)
       if (id === newRow.id){
         setUsers(users.map((row) => (row.id === newRow.id ? updatedRow : row)));
         return updatedRow;
       } else {
-        setShowSnackBar(true);
+        setShowErrorSnackbar(true);
       }
     })
   };
@@ -236,15 +241,24 @@ export default function UsersPage() {
       />
       <Snackbar 
           anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-          open={showSnackBar}
-          onClose={() => setShowSnackBar(false)}
+          open={showErrorSnackbar}
+          onClose={() => setShowErrorSnackbar(false)}
           autoHideDuration={3000}
-          key={"snackbar1"}
+          key={"userspage-snackbar-error-1"}
       >
         <SnackbarContent 
           style={{backgroundColor: "red", margin: "auto", display:"flex", justifyContent: "center", fontWeight: 530, fontSize: 16}}
           message={<p>Something went wrong, please try again.</p>}
         />
+      </Snackbar>
+      <Snackbar 
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          open={showDeletedSnackbar}
+          onClose={() => setShowDeletedSnackbar(false)}
+          autoHideDuration={3000}
+          key={"userspage-snackbar-deleted-1"}
+      >
+        <Alert severity="info">Deleted</Alert>
       </Snackbar>
     </Box>
   );
