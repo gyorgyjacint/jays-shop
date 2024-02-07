@@ -88,6 +88,16 @@ public class ProductController : ControllerBase
         if (product is null)
             return BadRequest();
 
+        if (model.PicturesUrls != null &&
+            (model.PicturesUrls.Any(u => u == null!) || model.PicturesUrls.Any(u => u == "null")))
+        {
+            var control = model.PicturesUrls.Where(u => u != "null" && u != null!).ToArray();
+            model.PicturesUrls = control.Length > 0 ? control : null;
+        }
+
+        if (model.ThumbnailUrl == "null")
+            model.ThumbnailUrl = null;
+
         if (product.ThumbnailUrl != null && (model.ThumbnailUrl == null || product.ThumbnailUrl.Length < 1))
             _productImageService.RemoveFile(product.ThumbnailUrl);
 
