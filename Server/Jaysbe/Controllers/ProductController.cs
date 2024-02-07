@@ -80,7 +80,7 @@ public class ProductController : ControllerBase
 
     [HttpPatch]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<Guid>> Update([FromBody] Product model)
+    public async Task<ActionResult<(Guid id, int errorCount)>> Update([FromForm] ProductUpdateRequest model)
     {
         _logger.LogInformation(nameof(Update));
         var product = await _context.Products!.FindAsync(model.ProductId);
@@ -89,18 +89,16 @@ public class ProductController : ControllerBase
             return BadRequest();
 
         if (product.ThumbnailUrl != null && (model.ThumbnailUrl == null || product.ThumbnailUrl.Length < 1))
-        {
             _productImageService.RemoveFile(product.ThumbnailUrl);
-        }
 
         if (product.PicturesUrls != null &&
             product.PicturesUrls.Count > model.PicturesUrls?.Count)
         {
             var accessRoutesToRemove = (model.PicturesUrls == null || !model.PicturesUrls.Any()
-                ? product.PicturesUrls
-                : product.PicturesUrls.Where(u => !model.PicturesUrls.Contains(u)))
+                    ? product.PicturesUrls
+                    : product.PicturesUrls.Where(u => !model.PicturesUrls.Contains(u)))
                 .ToArray();
-            
+
             if (accessRoutesToRemove.Length > 0)
             {
                 foreach (var accessRoute in accessRoutesToRemove)
@@ -110,11 +108,27 @@ public class ProductController : ControllerBase
             }
         }
 
+        if (model.ThumbnailNew != null)
+        {
+            var result = await _productImageService.AddImageAsync(model.ThumbnailNew, ModelState);
+            if (result.isSuccessful)
+                model.ThumbnailUrl = result.path;
+        }
+
+        if (model.PicturesNew != null || model.PicturesNew?.Count > 0)
+        {
+            var result = await _productImageService.AddImagesAsync(model.PicturesNew, ModelState);
+            if (result.paths.Any())
+                model.PicturesUrls = (model.PicturesUrls != null
+                    ? model.PicturesUrls.Concat(result.paths)
+                    : result.paths).ToList();
+        }
+
         _context.Entry(product).CurrentValues.SetValues(model);
         await _context.SaveChangesAsync();
 
         _logger.LogInformation($"Product with ID [{product.ProductId}] updated");
-        return Ok(product.ProductId);
+        return Ok(new { id = product.ProductId, errorCount = ModelState.ErrorCount });
     }
 
     [HttpGet("{id}")]
