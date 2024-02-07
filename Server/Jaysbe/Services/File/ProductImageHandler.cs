@@ -118,6 +118,23 @@ public class ProductImageHandler : IProductImageHandler
             errors.Count > 0 ? errors.ToArray() : null);
     }
 
+    public bool RemoveFile(string accessRoute)
+    {
+        var fileName = Path.GetFileName(accessRoute);
+        _logger.LogInformation($"{nameof(RemoveFile)} attempting to delete file {fileName}");
+        
+        var directory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+            _configuration["ProductImageUploadPath"] ??
+            throw new NullReferenceException("ProductImageUploadPath not found in configuration"));
+        var filePath = Path.Combine(directory, fileName);
+
+        if (!System.IO.File.Exists(filePath))
+            return false;
+        
+        System.IO.File.Delete(filePath);
+        return true;
+    }
+
     private static async Task<byte[]> ProcessFormFile<T>(IFormFile formFile,
         ModelStateDictionary modelState, string[] permittedExtensions,
         long sizeLimit)
