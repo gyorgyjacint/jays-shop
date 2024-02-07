@@ -30,7 +30,7 @@ public class Product
     public IEnumerable<ProductDescOption>? ProductDescriptions { get; set; }
     
     [MaxLength(150)]
-    public string ThumbnailUrl { get; set; }
+    public string? ThumbnailUrl { get; set; }
     public IList<string>? PicturesUrls { get; set; }
     
     public Category? Category { get; set; }
