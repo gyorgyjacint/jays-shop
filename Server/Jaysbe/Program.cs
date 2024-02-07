@@ -68,7 +68,7 @@ void AddServices()
 
     builder.Services.AddTransient<IAuthService, AuthService>();
     builder.Services.AddTransient<ITokenService, TokenService>();
-    builder.Services.AddTransient<IProductImageHandler, ProductImageHandler>();
+    builder.Services.AddTransient<IProductImageService, ProductImageService>();
     builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
     builder.Services.AddExceptionHandler<GlobalExceptionHandler>();

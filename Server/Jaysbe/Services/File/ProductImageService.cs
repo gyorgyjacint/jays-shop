@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Jaysbe.Services.File;
 
-public class ProductImageHandler : IProductImageHandler
+public class ProductImageService : IProductImageService
 {
-    private readonly ILogger<ProductImageHandler> _logger;
+    private readonly ILogger<ProductImageService> _logger;
     private readonly IConfiguration _configuration;
 
-    public ProductImageHandler(ILogger<ProductImageHandler> logger, IConfiguration configuration)
+    public ProductImageService(ILogger<ProductImageService> logger, IConfiguration configuration)
     {
         _logger = logger;
         _configuration = configuration;

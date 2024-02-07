@@ -16,15 +16,15 @@ public class ProductController : ControllerBase
     private readonly AppDbContext _context;
     private readonly ILogger<ProductController> _logger;
     private readonly IMapper _mapper;
-    private readonly IProductImageHandler _productImageHandler;
+    private readonly IProductImageService _productImageService;
 
-    public ProductController(AppDbContext context, IMapper mapper, IProductImageHandler productImageHandler,
+    public ProductController(AppDbContext context, IMapper mapper, IProductImageService productImageService,
         ILogger<ProductController> logger)
     {
         _context = context;
         _logger = logger;
         _mapper = mapper;
-        _productImageHandler = productImageHandler;
+        _productImageService = productImageService;
     }
 
     [HttpPost]
@@ -34,7 +34,7 @@ public class ProductController : ControllerBase
         _logger.LogInformation($"Attempt to register product [{product.Name}]");
         var mappedProduct = _mapper.Map<Product>(product);
 
-        var thumbnailResult = await _productImageHandler.AddImageAsync(product.Thumbnail, ModelState);
+        var thumbnailResult = await _productImageService.AddImageAsync(product.Thumbnail, ModelState);
         if (!thumbnailResult.isSuccessful)
         {
             _logger.LogInformation(
@@ -46,7 +46,7 @@ public class ProductController : ControllerBase
 
         if (product.Pictures != null)
         {
-            var picsResult = await _productImageHandler.AddImagesAsync(product.Pictures, ModelState);
+            var picsResult = await _productImageService.AddImagesAsync(product.Pictures, ModelState);
             if (picsResult.paths.Any())
             {
                 mappedProduct.PicturesUrls = (IList<string>?)picsResult.paths;
@@ -100,7 +100,7 @@ public class ProductController : ControllerBase
             {
                 foreach (var accessRoute in accessRoutesToRemove)
                 {
-                    var result = _productImageHandler.RemoveFile(accessRoute);
+                    var result = _productImageService.RemoveFile(accessRoute);
                 }
             }
         }

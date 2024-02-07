@@ -2,7 +2,7 @@
 
 namespace Jaysbe.Services.File;
 
-public interface IProductImageHandler
+public interface IProductImageService
 {
     public Task<(string path, bool isSuccessful, string[]? errorMessages)> AddImageAsync(IFormFile image,
         ModelStateDictionary modelState);
