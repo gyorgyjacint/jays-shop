@@ -12,6 +12,7 @@ import Users from './Pages/UsersPage';
 import Products from './Pages/ProductsPage';
 import OrdersPage from './Pages/OrdersPage';
 import ProductUpdatePage from './Pages/ProductUpdatePage';
+import { Box } from '@mui/material';
 
 function App() {
 
@@ -52,10 +53,10 @@ function App() {
   ]);
 
   return (
-    <>
+    <Box sx={{ minWidth: "100%", minHeight: "100vh"}}>
       <Layout />
       <RouterProvider router={router} />
-    </>
+    </Box>
   );
 }
 
