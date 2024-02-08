@@ -244,7 +244,7 @@ export default function ProductUpdatePage() {
         )}
         <Box display={"flex"} margin={"auto"} gap={"50px"}>
           <Button variant="contained" component="label">
-            Change thumbnail (.jpg, .jpeg, .png only)
+            {product["thumbnailUrl"] ? "Change" : "Add"} thumbnail (.jpg, .jpeg, .png only)
             <input
               accept=".jpg, .jpeg, .png"
               name="thumbnailNew"
