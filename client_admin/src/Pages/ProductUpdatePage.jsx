@@ -51,26 +51,19 @@ export default function ProductUpdatePage() {
   const handleSave = (e) => {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
-    let jsonContent = {};
 
-    for (const property in product) {
-      if (Object.hasOwnProperty.call(product, property)) {
-        const value = data.get(property);
-        if (value != null && value.length > 0) {
-          jsonContent[property] = data.get(property);
-        }
+    data.append("productId", product["productId"]);
+    data.append("thumbnailUrl", product["thumbnailUrl"] ?? null);
+
+    if (product["picturesUrls"] != null) {
+      for (const url of product["picturesUrls"]) {
+        data.append("picturesUrls", url)
       }
     }
 
-    jsonContent["productId"] = product["productId"];
-    jsonContent["thumbnailUrl"] = product["thumbnailUrl"];
-    jsonContent["picturesUrls"] = product["picturesUrls"];
-
-    const body = JSON.stringify(jsonContent);
-
-    fetchDataAsync("/api/product/update", "PATCH", body, { "Content-Type": "application/json" })
-    .then((id) => {
-      if (id === product["productId"]) {
+    fetchDataAsync("/api/product/update", "PATCH", data)
+    .then((res) => {
+      if (res.id === product["productId"]) {
         navigate("/products");
       }
     });
@@ -249,6 +242,29 @@ export default function ProductUpdatePage() {
             ))}
           </ImageList>
         )}
+        <Box display={"flex"} margin={"auto"} gap={"50px"}>
+          <Button variant="contained" component="label">
+            Change thumbnail (.jpg, .jpeg, .png only)
+            <input
+              accept=".jpg, .jpeg, .png"
+              name="thumbnailNew"
+              style={{ display: 'none' }}
+              id="thumbnail-button-file"
+              type="file"
+              />
+          </Button>
+          <Button variant="contained" component="label">
+            Add images (.jpg, .jpeg, .png only)
+            <input
+              accept=".jpg, .jpeg, .png"
+              name="picturesNew"
+              style={{ display: 'none' }}
+              id="images-button-file"
+              multiple
+              type="file"
+              />
+          </Button>
+        </Box>
 
         <Box
           sx={{
