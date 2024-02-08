@@ -15,11 +15,18 @@ import {
 import Loading from "../Components/Loading";
 import { GridDeleteIcon } from "@mui/x-data-grid";
 
+const inputStyle = {
+  backgroundColor: "white",
+  borderRadius: "5px"
+}
+
 export default function ProductUpdatePage() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [productNameModel, setProductNameModel] = useState({});
+  const [thumbnailPreview, setThumbnailPreview] = useState(null);
+  const [imgsPreview, setImgsPreview] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -86,6 +93,15 @@ export default function ProductUpdatePage() {
     setProduct(productData);
   };
 
+  const handleThumbnailUpload = (e) => { setThumbnailPreview(URL.createObjectURL(e.target.files[0])) }
+  const handleImageUpload = (e) => {
+    let res = [];
+    for (let i = 0; i < e.target.files.length; i++) {
+      res.push(URL.createObjectURL(e.target.files[i]))
+    }
+    setImgsPreview(res) 
+  }
+
   if (loading) {
     return <Loading />;
   }
@@ -105,6 +121,7 @@ export default function ProductUpdatePage() {
         autoComplete="off"
       >
         <TextField
+          sx={inputStyle}
           disabled={true}
           key={"productId"}
           name={"productId"}
@@ -112,6 +129,7 @@ export default function ProductUpdatePage() {
           defaultValue={product["productId"]}
         />
         <TextField
+          sx={inputStyle}
           key={"name"}
           name={"name"}
           label={productNameModel["name"]}
@@ -119,6 +137,7 @@ export default function ProductUpdatePage() {
           required
         />
         <TextField
+          sx={inputStyle}
           key={"brand"}
           name={"brand"}
           label={productNameModel["brand"]}
@@ -126,6 +145,7 @@ export default function ProductUpdatePage() {
           required
         />
         <TextField
+          sx={inputStyle}
           key={"price"}
           name={"price"}
           label={productNameModel["price"]}
@@ -134,6 +154,7 @@ export default function ProductUpdatePage() {
           required
         />
         <TextField
+          sx={inputStyle}
           key={"discountPrice"}
           name={"discountPrice"}
           label={productNameModel["discountPrice"]}
@@ -141,18 +162,21 @@ export default function ProductUpdatePage() {
           type="number"
         />
         <TextField
+          sx={inputStyle}
           key={"color"}
           name={"color"}
           label={productNameModel["color"]}
           defaultValue={product["color"]}
         />
         <TextField
+          sx={inputStyle}
           key={"category"}
           name={"category"}
           label={productNameModel["category"]}
           defaultValue={product["category"]}
         />
         <TextField
+          sx={inputStyle}
           key={"description"}
           name={"description"}
           label={productNameModel["description"]}
@@ -160,12 +184,14 @@ export default function ProductUpdatePage() {
           required
         />
         <TextField
+          sx={inputStyle}
           key={"productDescriptions"}
           name={"productDescriptions"}
           label={productNameModel["productDescriptions"]}
           defaultValue={product["productDescriptions"]}
         />
         <TextField
+          sx={inputStyle}
           key={"productNumber"}
           name={"productNumber"}
           label={productNameModel["productNumber"]}
@@ -173,6 +199,7 @@ export default function ProductUpdatePage() {
           type="number"
         />
         <TextField
+          sx={inputStyle}
           key={"quantity"}
           name={"quantity"}
           label={productNameModel["quantity"]}
@@ -194,6 +221,7 @@ export default function ProductUpdatePage() {
             defaultValue={product["thumbnailUrl"]}
           >
             <img
+              id="thumbnail-preview"
               src={product["thumbnailUrl"]}
               alt="Thumbnail"
               height={"100%"}
@@ -246,6 +274,7 @@ export default function ProductUpdatePage() {
           <Button variant="contained" component="label">
             {product["thumbnailUrl"] ? "Change" : "Add"} thumbnail (.jpg, .jpeg, .png only)
             <input
+              onChange={handleThumbnailUpload}
               accept=".jpg, .jpeg, .png"
               name="thumbnailNew"
               style={{ display: 'none' }}
@@ -256,6 +285,7 @@ export default function ProductUpdatePage() {
           <Button variant="contained" component="label">
             Add images (.jpg, .jpeg, .png only)
             <input
+              onChange={handleImageUpload}
               accept=".jpg, .jpeg, .png"
               name="picturesNew"
               style={{ display: 'none' }}
@@ -282,6 +312,71 @@ export default function ProductUpdatePage() {
           </Button>
         </Box>
       </Grid>
+      {thumbnailPreview && (
+          <Box
+          sx={{
+            backgroundColor: "greenyellow",
+            padding: "2px",
+            maxWidth: 500,
+            maxHeight: 450,
+            margin: "auto",
+            alignContent: "center",
+            alignSelf: "center",
+          }}
+          key={"thumbnailPreview"}
+          name={"thumbnailPreview"}
+          defaultValue={product["thumbnailPreview"]}
+        >
+          <img
+            id="thumbnail-preview"
+            src={thumbnailPreview}
+            alt="Thumbnail"
+            height={"100%"}
+            width={"100%"}
+            loading="lazy"
+          />
+          <Tooltip
+            title="Delete"
+            onClick={()=> {console.log("todo")}}
+            sx={{ position: "absolute" }}
+          >
+            <IconButton>
+              <GridDeleteIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      )}
+          {imgsPreview && (
+          <ImageList
+            key={"imgsPreview"}
+            defaultValue={imgsPreview}
+            sx={{
+              width: 500,
+              height: "auto",
+              alignContent: "center",
+              alignSelf: "center",
+              margin: "auto"
+            }}
+            cols={3}
+            rowHeight={164}
+          >
+            {imgsPreview?.map((source) => (
+              <ImageListItem key={source} sx={{backgroundColor: "greenyellow", padding: "2px", gap: "5px", margin: "6px"}}>
+                <img src={source} alt={source} loading="lazy" />
+                <Box sx={{ position: "absolute"}}>
+                  <Tooltip
+                    title="Delete"
+                    onClick={() => console.log("todo")}
+                  >
+                    <IconButton>
+                      <GridDeleteIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              </ImageListItem>
+            ))}
+          </ImageList>
+        )}
     </Container>
   );
 }
