@@ -102,7 +102,7 @@ public class ProductController : ControllerBase
             _productImageService.RemoveFile(product.ThumbnailUrl);
 
         if (product.PicturesUrls != null &&
-            product.PicturesUrls.Count > model.PicturesUrls?.Count)
+            product.PicturesUrls.Count > (model.PicturesUrls?.Count ?? 0))
         {
             var accessRoutesToRemove = (model.PicturesUrls == null || !model.PicturesUrls.Any()
                     ? product.PicturesUrls
