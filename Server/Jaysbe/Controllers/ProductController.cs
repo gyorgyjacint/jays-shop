@@ -123,6 +123,9 @@ public class ProductController : ControllerBase
             var result = await _productImageService.AddImageAsync(model.ThumbnailNew, ModelState);
             if (result.isSuccessful)
                 model.ThumbnailUrl = result.path;
+            
+            if (result.isSuccessful && product.ThumbnailUrl != null)
+                _productImageService.RemoveFile(product.ThumbnailUrl);
         }
 
         if (model.PicturesNew != null || model.PicturesNew?.Count > 0)
