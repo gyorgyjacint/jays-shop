@@ -132,9 +132,12 @@ public class ProductController : ControllerBase
         {
             var result = await _productImageService.AddImagesAsync(model.PicturesNew, ModelState);
             if (result.paths.Any())
+            {
+                var paths = result.paths.Where(s => !string.IsNullOrEmpty(s));
                 model.PicturesUrls = (model.PicturesUrls != null
-                    ? model.PicturesUrls.Concat(result.paths)
-                    : result.paths).ToList();
+                    ? model.PicturesUrls.Concat(paths)
+                    : paths).ToList();
+            }
         }
 
         _context.Entry(product).CurrentValues.SetValues(model);
