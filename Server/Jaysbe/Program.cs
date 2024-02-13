@@ -4,6 +4,7 @@ using Jaysbe.Data;
 using Jaysbe.Infrastucture;
 using Jaysbe.Services.Authentication;
 using Jaysbe.Services.File;
+using Jaysbe.Services.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -69,8 +70,9 @@ void AddServices()
     builder.Services.AddTransient<IAuthService, AuthService>();
     builder.Services.AddTransient<ITokenService, TokenService>();
     builder.Services.AddTransient<IProductImageService, ProductImageService>();
-    builder.Services.AddAutoMapper(typeof(Program).Assembly);
+    builder.Services.AddTransient<IProductRepository, ProductRepository>();
 
+    builder.Services.AddAutoMapper(typeof(Program).Assembly);
     builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
     builder.Services.AddProblemDetails();
 }
