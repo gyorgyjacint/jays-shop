@@ -7,17 +7,13 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Jaysbe.Data;
 
-public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string>
+public class AppDbContext(DbContextOptions<AppDbContext> options)
+    : IdentityDbContext<IdentityUser, IdentityRole, string>(options)
 {
     public DbSet<Product>? Products { get; set; }
     public DbSet<Category>? Categories { get; set; }
     public DbSet<SubCategory>? SubCategories { get; set; }
-
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-    {
-    }
-
-
+    
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -25,9 +21,8 @@ public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string
         var env = this.GetService<IWebHostEnvironment>();
 
         if (!env.IsDevelopment())
-        {
             return;
-        }
+        
         Debug.WriteLine($"[{nameof(OnModelCreating)}]: Development environment, seeding database");
         
         var hasher = new PasswordHasher<IdentityUser>();
@@ -36,6 +31,7 @@ public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string
         builder.Entity<IdentityRole>().HasData(new IdentityRole
             { Id = testRoleId, Name = "TestUser", NormalizedName = "TESTUSER" });
 
+        var hashedPassword = hasher.HashPassword(null, "asdasd");
         var users = new List<IdentityUser>();
 
         for (int i = 1; i <= 10; i++)
@@ -48,7 +44,7 @@ public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string
                     NormalizedUserName = $"USER{i}",
                     Email = $"user{i}@user.com",
                     NormalizedEmail = $"USER{i}@USER.COM",
-                    PasswordHash = hasher.HashPassword(null, "asdasd"),
+                    PasswordHash = hashedPassword,
                 });
         }
 
