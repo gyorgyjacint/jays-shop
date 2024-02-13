@@ -1,6 +1,6 @@
 ﻿using Jaysbe.Models;
 
-namespace Jaysbe.Contracts;
+namespace Jaysbe.Dtos;
 
 public class ProductResponseDto
 {

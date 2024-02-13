@@ -2,7 +2,7 @@
 using Jaysbe.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Jaysbe.Contracts;
+namespace Jaysbe.Dtos;
 
 public class ProductRequestDto
 {
