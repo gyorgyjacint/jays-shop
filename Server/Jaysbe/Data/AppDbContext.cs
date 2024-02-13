@@ -10,9 +10,9 @@ namespace Jaysbe.Data;
 public class AppDbContext(DbContextOptions<AppDbContext> options)
     : IdentityDbContext<IdentityUser, IdentityRole, string>(options)
 {
-    public DbSet<Product>? Products { get; set; }
-    public DbSet<Category>? Categories { get; set; }
-    public DbSet<SubCategory>? SubCategories { get; set; }
+    public DbSet<Product> Products { get; set; }
+    public DbSet<Category> Categories { get; set; }
+    public DbSet<SubCategory> SubCategories { get; set; }
     
     protected override void OnModelCreating(ModelBuilder builder)
     {
