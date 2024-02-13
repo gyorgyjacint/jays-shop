@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Jaysbe.Contracts;
 using Jaysbe.Data;
+using Jaysbe.Dtos;
 using Jaysbe.Models;
 using Jaysbe.Services.File;
 using Microsoft.AspNetCore.Authorization;
@@ -30,27 +31,27 @@ public class ProductController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Post([FromForm] ProductRequestDto product)
     {
-        _logger.LogInformation(nameof(Post));
-        _logger.LogInformation($"Attempt to register product [{product.Name}]");
+        _logger.LogInformation(nameof(Post) + $" attempts to register product [{product.Name}]");
         var mappedProduct = _mapper.Map<Product>(product);
 
         var thumbnailResult = await _productImageService.AddImageAsync(product.Thumbnail, ModelState);
-        if (!thumbnailResult.isSuccessful)
+
+        if (thumbnailResult.isSuccessful)
+        {
+            mappedProduct.ThumbnailUrl = thumbnailResult.path;
+        }
+        else
         {
             _logger.LogInformation(
                 $"Register of product [{product.Name}] is unsuccessful, {nameof(thumbnailResult.isSuccessful)} is false");
-            return BadRequest(thumbnailResult.errorMessages);
+            return BadRequest(ModelState);
         }
-
-        mappedProduct.ThumbnailUrl = thumbnailResult.path;
 
         if (product.Pictures != null)
         {
             var picsResult = await _productImageService.AddImagesAsync(product.Pictures, ModelState);
             if (picsResult.paths.Any())
-            {
-                mappedProduct.PicturesUrls = (IList<string>?)picsResult.paths;
-            }
+                mappedProduct.PicturesUrls = picsResult.paths.ToList();
 
             _logger.LogInformation($"Saved [{picsResult.paths.Count()}] out of {product.Pictures.Count} images");
         }
@@ -69,7 +70,7 @@ public class ProductController : ControllerBase
         var product = await _context.Products.FindAsync(id);
 
         if (product is null)
-            return BadRequest();
+            return NotFound();
 
         _context.Remove(product);
         await _context.SaveChangesAsync();
@@ -86,7 +87,7 @@ public class ProductController : ControllerBase
         var product = await _context.Products!.FindAsync(model.ProductId);
 
         if (product is null)
-            return BadRequest();
+            return NotFound();
 
         if (model.PicturesUrls != null &&
             (model.PicturesUrls.Any(u => u == null!) || model.PicturesUrls.Any(u => u == "null")))
