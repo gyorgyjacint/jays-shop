@@ -1,7 +1,6 @@
 ﻿using Jaysbe.Contracts;
 using Jaysbe.Services.Authentication;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Jaysbe.Controllers;
 
@@ -60,7 +59,7 @@ public class AuthController : ControllerBase
         );
         
         LogAuthorized(request.Email);
-        return Ok(new AuthResponse(result.Email, result.Username, null));
+        return Ok(new AuthResponse(result.Email, result.Username));
     }
 
     [HttpPost]
@@ -94,7 +93,7 @@ public class AuthController : ControllerBase
         
         LogAuthorized(request.Email);
         
-        return Ok(new AuthResponse(result.Email, result.Username, null));
+        return Ok(new AuthResponse(result.Email, result.Username));
     }
 
     private void AddErrors(AuthResult result)
