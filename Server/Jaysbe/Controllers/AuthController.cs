@@ -1,6 +1,7 @@
 ﻿using Jaysbe.Contracts;
 using Jaysbe.Services.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Jaysbe.Controllers;
 
