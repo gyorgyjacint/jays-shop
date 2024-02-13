@@ -154,30 +154,28 @@ public class ProductImageService : IProductImageService
 
         try
         {
-            using (var memoryStream = new MemoryStream())
+            using var memoryStream = new MemoryStream();
+            await formFile.CopyToAsync(memoryStream);
+
+            // Check the content length in case the file's only
+            // content was a BOM and the content is actually
+            // empty after removing the BOM.
+            if (memoryStream.Length == 0)
             {
-                await formFile.CopyToAsync(memoryStream);
+                modelState.AddModelError(formFile.Name, $"({trustedFileNameForDisplay}) is empty.");
+            }
 
-                // Check the content length in case the file's only
-                // content was a BOM and the content is actually
-                // empty after removing the BOM.
-                if (memoryStream.Length == 0)
-                {
-                    modelState.AddModelError(formFile.Name, $"({trustedFileNameForDisplay}) is empty.");
-                }
-
-                if (!IsValidFileExtensionAndSignature(
-                        formFile.FileName, memoryStream, permittedExtensions))
-                {
-                    modelState.AddModelError(formFile.Name,
-                        $"({trustedFileNameForDisplay}) file " +
-                        "type isn't permitted or the file's signature " +
-                        "doesn't match the file's extension.");
-                }
-                else
-                {
-                    return memoryStream.ToArray();
-                }
+            if (!IsValidFileExtensionAndSignature(
+                    formFile.FileName, memoryStream, permittedExtensions))
+            {
+                modelState.AddModelError(formFile.Name,
+                    $"({trustedFileNameForDisplay}) file " +
+                    "type isn't permitted or the file's signature " +
+                    "doesn't match the file's extension.");
+            }
+            else
+            {
+                return memoryStream.ToArray();
             }
         }
         catch (Exception ex)
@@ -201,12 +199,10 @@ public class ProductImageService : IProductImageService
 
         data.Position = 0;
 
-        using (var reader = new BinaryReader(data))
-        {
-            var signatures = FileSignature[ext];
-            var headerBytes = reader.ReadBytes(signatures.Max(m => m.Length));
+        using var reader = new BinaryReader(data);
+        var signatures = FileSignature[ext];
+        var headerBytes = reader.ReadBytes(signatures.Max(m => m.Length));
 
-            return signatures.Any(signature => headerBytes.Take(signature.Length).SequenceEqual(signature));
-        }
+        return signatures.Any(signature => headerBytes.Take(signature.Length).SequenceEqual(signature));
     }
 }
