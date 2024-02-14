@@ -1,8 +1,7 @@
-﻿using Jaysbe.Data;
-using Jaysbe.Models;
+﻿using Jaysbe.Models;
+using Jaysbe.Services.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.EntityFrameworkCore;
 
 namespace Jaysbe.Controllers;
 
@@ -10,32 +9,39 @@ namespace Jaysbe.Controllers;
 [Route("api/[controller]/[action]")]
 public class CategoryController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly ICategoryRepository _repository;
     private readonly ILogger<CategoryController> _logger;
     
-    public CategoryController(AppDbContext context, ILogger<CategoryController> logger)
+    public CategoryController(ICategoryRepository repository, ILogger<CategoryController> logger)
     {
-        _context = context;
+        _repository = repository;
         _logger = logger;
     }
     
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Post(Category category)
     {
         _logger.LogInformation(nameof(Post));
-        
-        await _context.Categories.AddAsync(category);
-        await _context.SaveChangesAsync();
-
-        _logger.LogInformation($"{nameof(Post)}, Category entity added to database.");
-        return Created();
+        var result = await _repository.Add(category);
+        return result != null ? Created() : BadRequest();
     }
 
     [HttpGet]
-    public async Task<Category> GetFirst()
+    public async Task<Category[]> GetAll()
     {
-        _logger.LogInformation(nameof(GetFirst));
-        var item = await _context.Categories.FirstAsync();
-        return item;
+        _logger.LogInformation(nameof(GetAll));
+        var result = await _repository.GetAll();
+        return result;
     }
+
+    [HttpDelete]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult> Delete(Guid id)
+    {
+        _logger.LogInformation(nameof(Delete));
+        var result = await _repository.Delete(id);
+        return result != null ? Ok(result) : NotFound(id);
+    }
+
 }
