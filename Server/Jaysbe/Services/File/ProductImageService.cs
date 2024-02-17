@@ -73,7 +73,9 @@ public class ProductImageService : IProductImageService
 
         var newFileName = Guid.NewGuid() + extension;
         var filePath = Path.Combine(path, newFileName);
-        var imageRoute = Path.Combine(_configuration["ImageAccessRoute"]!, newFileName);
+        var imageAccessRoute = _configuration["ImageAccessRoute"]  
+                               ?? throw new NullReferenceException("ImageAccessRoute not found in configuration");
+        var imageRoute = Path.Combine(imageAccessRoute, newFileName);
 
         await using (var stream = System.IO.File.Create(filePath))
         {
