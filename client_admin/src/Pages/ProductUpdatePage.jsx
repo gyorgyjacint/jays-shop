@@ -69,8 +69,8 @@ export default function ProductUpdatePage() {
     }
 
     fetchDataAsync("/api/product/update", "PATCH", data)
-    .then((res) => {
-      if (res.id === product["productId"]) {
+    .then((id) => {
+      if (id === product["productId"]) {
         navigate("/products");
       }
     });
