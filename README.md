@@ -23,3 +23,12 @@ A webshop project
   - JavaScript
   - React
   - MaterialUI
+
+## Other
+- secrets.json must have:
+  - ConnectionString
+  - IssueAudience
+  - IssueSign
+  - IssuerSigningKey
+  - AdminEmail
+  - AdminPw
