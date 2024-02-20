@@ -215,3 +215,8 @@ async Task CreateAdminIfNotExists()
         }
     }
 }
+
+namespace Jaysbe
+{
+    public class Program {}
+}
