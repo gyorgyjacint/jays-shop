@@ -5,7 +5,7 @@ using Jaysbe.Contracts;
 
 namespace Jaysbe.IntegrationTests.Controllers;
 
-[Collection("auth")]
+[Collection("tests")]
 public class AuthControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
 {
     private readonly HttpClient _client;
