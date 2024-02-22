@@ -35,7 +35,7 @@ public class CategoryController : ControllerBase
         return result;
     }
 
-    [HttpDelete]
+    [HttpDelete("{id}")]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Delete(Guid id)
     {
