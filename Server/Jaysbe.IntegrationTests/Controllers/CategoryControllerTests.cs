@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using Jaysbe.IntegrationTests.Bases;
 using Jaysbe.Models;
 using Newtonsoft.Json;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Jaysbe.IntegrationTests.Controllers;
 
@@ -45,7 +46,7 @@ public class CategoryControllerTests : AuthBase, IClassFixture<CustomWebApplicat
         var content = JsonContent.Create(data);
 
         // Act
-        var response = await Client.PostAsync(url, content);
+        var response = await AuthorizedClient.PostAsync(url, content);
 
         // Assert
         Assert.Multiple(() =>
@@ -68,8 +69,8 @@ public class CategoryControllerTests : AuthBase, IClassFixture<CustomWebApplicat
         var content = JsonContent.Create(data);
 
         // Act
-        var firstResponse = await Client.PostAsync(url, content);
-        var response = await Client.PostAsync(url, content);
+        var firstResponse = await AuthorizedClient.PostAsync(url, content);
+        var response = await AuthorizedClient.PostAsync(url, content);
 
         // Assert
         Assert.Multiple(() =>
@@ -85,7 +86,7 @@ public class CategoryControllerTests : AuthBase, IClassFixture<CustomWebApplicat
     public async Task GetAll_Returns_Categories(string url)
     {
         // Act
-        var response = await Client.GetAsync(url);
+        var response = await AuthorizedClient.GetAsync(url);
         var json = await response.Content.ReadAsStringAsync();
         var responseData = JsonConvert.DeserializeObject<Category[]>(json);
 
@@ -102,7 +103,7 @@ public class CategoryControllerTests : AuthBase, IClassFixture<CustomWebApplicat
     public async Task GetAll_Returns_Empty_Collection(string url)
     {
         // Act
-        var response = await Client.GetAsync(url);
+        var response = await AuthorizedClient.GetAsync(url);
         var json = await response.Content.ReadAsStringAsync();
         var responseData = JsonConvert.DeserializeObject<Category[]>(json);
 
@@ -124,12 +125,12 @@ public class CategoryControllerTests : AuthBase, IClassFixture<CustomWebApplicat
             Name = "toDelete"
         };
         var postContent = JsonContent.Create(data);
-        var postResponse = await Client.PostAsync("/api/category/post", postContent);
+        var postResponse = await AuthorizedClient.PostAsync("/api/category/post", postContent);
         var id = await postResponse.Content.ReadAsStringAsync();
         Assert.True(postResponse.IsSuccessStatusCode);
 
         // Act
-        var response = await Client.DeleteAsync(url + "/" + id);
+        var response = await AuthorizedClient.DeleteAsync(url + "/" + id);
 
         // Assert
         Assert.True(response.IsSuccessStatusCode);
