@@ -21,6 +21,7 @@ public class ProductController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Post([FromForm] ProductRequestDto model)
     {
         _logger.LogInformation(nameof(Post) + $" attempts to register product [{model.Name}]");
