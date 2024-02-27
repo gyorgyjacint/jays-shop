@@ -66,7 +66,14 @@ public class ProductRepository : IProductRepository
 
         _context.Remove(product);
         await _context.SaveChangesAsync();
+        
+        if (product?.ThumbnailUrl != null)
+            _productImageService.RemoveFile(product.ThumbnailUrl);
 
+        if (product?.PicturesUrls?.Count > 0)
+            foreach (var route in product.PicturesUrls)
+                _productImageService.RemoveFile(route);
+        
         _logger.LogInformation($"Product with ID [{product.ProductId}] deleted");
 
         return true;
