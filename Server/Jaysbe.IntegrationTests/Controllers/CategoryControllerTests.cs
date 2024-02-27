@@ -72,6 +72,7 @@ public class CategoryControllerTests : AuthBase, IClassFixture<CustomWebApplicat
         // Assert
         Assert.Multiple(() =>
         {
+            Assert.True(firstResponse.IsSuccessStatusCode);
             Assert.False(response.IsSuccessStatusCode);
             Assert.True(response.StatusCode == HttpStatusCode.BadRequest);
         });
@@ -81,9 +82,6 @@ public class CategoryControllerTests : AuthBase, IClassFixture<CustomWebApplicat
     [InlineData("/api/category/getall")]
     public async Task GetAll_Returns_Categories(string url)
     {
-        // Prepare
-        await Post_Returns_Success("/api/category/post");
-
         // Act
         var response = await Client.GetAsync(url);
         var json = await response.Content.ReadAsStringAsync();
@@ -93,7 +91,7 @@ public class CategoryControllerTests : AuthBase, IClassFixture<CustomWebApplicat
         Assert.Multiple(() =>
         {
             Assert.True(response.IsSuccessStatusCode);
-            Assert.True(responseData?.Any());
+            Assert.True(responseData?.Length > 0);
         });
     }
 
