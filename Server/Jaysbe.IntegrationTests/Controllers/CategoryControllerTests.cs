@@ -9,8 +9,10 @@ namespace Jaysbe.IntegrationTests.Controllers;
 [Collection("tests")]
 public class CategoryControllerTests : AuthBase, IClassFixture<CustomWebApplicationFactory<Program>>
 {
-    public CategoryControllerTests(CustomWebApplicationFactory<Program> applicationFactory) : base(applicationFactory,
-        "admin@admin.com", "admin123") { }
+    public CategoryControllerTests(CustomWebApplicationFactory<Program> applicationFactory)
+        : base(applicationFactory, "admin@admin.com", "admin123")
+    {
+    }
 
     [Theory]
     [InlineData("/api/category/post")]
@@ -52,7 +54,7 @@ public class CategoryControllerTests : AuthBase, IClassFixture<CustomWebApplicat
             Assert.True(response.StatusCode == HttpStatusCode.Created);
         });
     }
-    
+
     [Theory]
     [InlineData("/api/category/post")]
     public async Task Post_Returns_BadResult_On_Duplicate_Name(string url)
@@ -111,7 +113,7 @@ public class CategoryControllerTests : AuthBase, IClassFixture<CustomWebApplicat
             Assert.False(responseData?.Any());
         });
     }
-    
+
     [Theory]
     [InlineData("/api/category/delete")]
     public async Task Delete_Returns_Success(string url)
@@ -128,7 +130,7 @@ public class CategoryControllerTests : AuthBase, IClassFixture<CustomWebApplicat
 
         // Act
         var response = await Client.DeleteAsync(url + "/" + id);
-        
+
         // Assert
         Assert.True(response.IsSuccessStatusCode);
     }
