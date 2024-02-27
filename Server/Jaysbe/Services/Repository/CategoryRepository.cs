@@ -26,7 +26,14 @@ public class CategoryRepository : ICategoryRepository
     public async Task<Guid?> Add(Category model)
     {
         var entity = await _context.Categories.AddAsync(model);
-        await _context.SaveChangesAsync();
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception)
+        {
+            return null;
+        }
 
         _logger.LogInformation($"{nameof(Add)}, Category entity added to database.");
         return entity.Entity.CategoryId;
