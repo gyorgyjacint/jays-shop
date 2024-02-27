@@ -30,4 +30,15 @@
       <ProjectReference Include="..\Jaysbe\Jaysbe.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="TestSources\invalid-1.gif" />
+      <Content Include="TestSources\invalid-1.gif">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <None Remove="TestSources\valid-1.png" />
+      <Content Include="TestSources\valid-1.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
 </Project>
