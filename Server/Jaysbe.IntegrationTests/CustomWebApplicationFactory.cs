@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Jaysbe.IntegrationTests;
 
@@ -23,6 +24,6 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
             });
         });
         
-        builder.UseEnvironment("Development");
+        builder.UseEnvironment(Environments.Development);
     }
 }
