@@ -11,7 +11,6 @@ public class ProductControllerTests : AuthBase, IClassFixture<CustomWebApplicati
 {
     private readonly MultipartFormDataContent _multipartContentBase;
     private const string ValidFileRoute = "TestSources/valid-1.png";
-    private const string InvalidFileRoute = "TestSources/invalid-1.gif";
 
     public ProductControllerTests(CustomWebApplicationFactory<Program> applicationFactory)
         : base(applicationFactory, "admin@admin.com", "admin123")
@@ -174,11 +173,10 @@ public class ProductControllerTests : AuthBase, IClassFixture<CustomWebApplicati
 
         var authJson = await authorizedResponse.Content.ReadAsStringAsync();
         var unauthJson = await unauthorizedResponse.Content.ReadAsStringAsync();
+        var option = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
-        var authProduct = JsonSerializer.Deserialize<Product>(authJson,
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-        var unauthProduct = JsonSerializer.Deserialize<Product>(unauthJson,
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        var authProduct = JsonSerializer.Deserialize<Product>(authJson, option);
+        var unauthProduct = JsonSerializer.Deserialize<Product>(unauthJson, option);
         
         // Assert
         Assert.True(authorizedResponse.IsSuccessStatusCode && unauthorizedResponse.IsSuccessStatusCode);
@@ -306,6 +304,38 @@ public class ProductControllerTests : AuthBase, IClassFixture<CustomWebApplicati
         // Assert
         Assert.False(response.IsSuccessStatusCode);
         Assert.Equivalent(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Theory]
+    [InlineData("/api/product/getall")]
+    public async Task GetAll_Returns_Correct_Count(string url)
+    {
+        // Arrange
+        var baseContent = GetMultipartFormDataContent(ValidFileRoute);
+        var multipartForms = new[]
+        {
+            GetMultipartCopy(baseContent),
+            GetMultipartCopy(baseContent),
+            GetMultipartCopy(baseContent),
+            GetMultipartCopy(baseContent),
+            GetMultipartCopy(baseContent),
+        };
+
+        foreach (var part in multipartForms)
+        {
+            var postResult = await AuthorizedClient.PostAsync("/api/product/post", part);
+            Assert.True(postResult.IsSuccessStatusCode);
+        }
+        
+        // Act
+        var response = await UnauthorizedClient.GetAsync(url);
+        var jsonContent = await response.Content.ReadAsStringAsync();
+        var content = JsonSerializer.Deserialize<Product[]>(jsonContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        
+        // Assert
+        Assert.True(response.IsSuccessStatusCode);
+        Assert.True(content?.Length >= 5);
+        Assert.True(content.All(c => c.ProductId != null));
     }
 
     private ByteArrayContent GetFileContent(string path)
