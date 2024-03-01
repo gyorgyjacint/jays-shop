@@ -51,7 +51,7 @@ public class UserControllerTests : AuthBase, IClassFixture<CustomWebApplicationF
     public async Task Update_Needs_Admin_Role(string url)
     {
         // Act
-        var response = await UnauthorizedClient.GetAsync(url);
+        var response = await UnauthorizedClient.PatchAsync(url, new StringContent(""));
         
         // Assert
         Assert.False(response.IsSuccessStatusCode);
