@@ -84,6 +84,8 @@ public class UserControllerTests : AuthBase, IClassFixture<CustomWebApplicationF
         var postData = new RegistrationRequest($"test-{nRandom}@user.com", $"user-{nRandom}", $"password{nRandom}");
         var postContent = JsonContent.Create(postData);
         var postResponse = await AuthorizedClient.PostAsync("/api/auth/register", postContent);
+        if (!postResponse.IsSuccessStatusCode)
+            Assert.Fail("Registering new user to update failed");
         
         var usersResponse = await AuthorizedClient.GetAsync("api/User/GetAll");
         var usersJson = await usersResponse.Content.ReadAsStringAsync();
@@ -111,5 +113,62 @@ public class UserControllerTests : AuthBase, IClassFixture<CustomWebApplicationF
         Assert.Equivalent(HttpStatusCode.OK, response.StatusCode);
         Assert.NotNull(userDto);
         Assert.Equivalent(contentData.Email, userDto.Email);
+    }
+    
+    [Theory]
+    [InlineData("/api/user/delete/")]
+    public async Task Delete_Is_Successful(string url)
+    {
+        // Arrange
+        var nRandom = new Random().Next();
+        var postData = new RegistrationRequest($"test-{nRandom}@user.com", $"user-{nRandom}", $"password{nRandom}");
+        var postContent = JsonContent.Create(postData);
+        var postResponse = await AuthorizedClient.PostAsync("/api/auth/register", postContent);
+        if (!postResponse.IsSuccessStatusCode)
+            Assert.Fail("Registering new user to update failed");
+        
+        var usersResponse = await AuthorizedClient.GetAsync("api/User/GetAll");
+        var usersJson = await usersResponse.Content.ReadAsStringAsync();
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        var users = JsonSerializer.Deserialize<UserDto<string>[]>(usersJson, options);
+        var user = users?.FirstOrDefault(dto => dto.UserName != null && !dto.UserName.Contains("admin", StringComparison.CurrentCultureIgnoreCase));
+        Assert.NotNull(user);
+        
+        // Act
+        var response = await AuthorizedClient.DeleteAsync(url + user.Id);
+        var checkResponse = await AuthorizedClient.GetAsync("api/User/GetAll");
+        var contentJson = await checkResponse.Content.ReadAsStringAsync();
+        var content = JsonSerializer.Deserialize<UserDto<string>[]>(contentJson,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        
+        // Assert
+        Assert.True(response.IsSuccessStatusCode);
+        Assert.NotNull(content);
+        Assert.Equivalent(HttpStatusCode.OK, response.StatusCode);
+        Assert.True(content.All(u => u.Id != user.Id));
+    }
+    
+    [Theory]
+    [InlineData("/api/user/delete/")]
+    public async Task Delete_Needs_Admin_Role(string url)
+    {
+        // Act
+        var response = await UnauthorizedClient.DeleteAsync(url + Guid.NewGuid());
+        
+        // Assert
+        Assert.False(response.IsSuccessStatusCode);
+        Assert.Equivalent(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+    
+    [Theory]
+    [InlineData("/api/user/delete/")]
+    public async Task Delete_Returns_NotFound(string url)
+    {
+        // Act
+        var response = await UnauthorizedClient.DeleteAsync(url + Guid.NewGuid());
+        
+        // Assert
+        Assert.False(response.IsSuccessStatusCode);
+        Assert.Equivalent(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 }
