@@ -27,7 +27,7 @@ public class UserController : ControllerBase
     }
     
     [Authorize(Roles = "Admin")]
-    [HttpGet("{userId}")]
+    [HttpDelete("{userId}")]
     public async Task<IActionResult> Delete([FromRoute] Guid userId)
     {
         _logger.LogInformation(nameof(Delete));
