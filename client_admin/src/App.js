@@ -13,6 +13,7 @@ import Products from './Pages/ProductsPage';
 import OrdersPage from './Pages/OrdersPage';
 import ProductUpdatePage from './Pages/ProductUpdatePage';
 import { Box } from '@mui/material';
+import CategoryPage from './Pages/CategoryPage';
 
 function App() {
 
@@ -49,6 +50,10 @@ function App() {
     {
       path: "/orders",
       element: <OrdersPage />
+    },
+    {
+      path: "/categories",
+      element: <CategoryPage />
     }
   ]);
 
