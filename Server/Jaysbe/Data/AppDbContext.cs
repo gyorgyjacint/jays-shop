@@ -18,10 +18,16 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     {
         base.OnModelCreating(builder);
 
+        builder.Entity<Category>()
+            .HasIndex(e => e.Name)
+            .IsUnique();
+
         var env = this.GetService<IWebHostEnvironment>();
 
         if (!env.IsDevelopment())
             return;
+        
+        // Seeds
         
         Debug.WriteLine($"[{nameof(OnModelCreating)}]: Development environment, seeding database");
         

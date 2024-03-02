@@ -201,13 +201,16 @@ void AddAdmin()
 
 async Task CreateAdminIfNotExists()
 {
+    var adminEmail = builder.Configuration["AdminEmail"];
+    var adminPw = builder.Configuration["AdminPw"];
+    
     using var scope = app.Services.CreateScope();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-    var adminInDb = await userManager.FindByEmailAsync(builder.Configuration["AdminEmail"]);
+    var adminInDb = await userManager.FindByEmailAsync(adminEmail);
     if (adminInDb == null)
     {
-        var admin = new IdentityUser { UserName = "admin", Email = builder.Configuration["AdminEmail"] };
-        var adminCreated = await userManager.CreateAsync(admin, builder.Configuration["AdminPw"]);
+        var admin = new IdentityUser { UserName = "admin", Email = adminEmail };
+        var adminCreated = await userManager.CreateAsync(admin, adminPw);
 
         if (adminCreated.Succeeded)
         {

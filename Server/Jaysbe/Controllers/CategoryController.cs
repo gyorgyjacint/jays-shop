@@ -20,11 +20,11 @@ public class CategoryController : ControllerBase
     
     [HttpPost]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Post(Category category)
+    public async Task<IActionResult> Post([FromBody]Category category)
     {
         _logger.LogInformation(nameof(Post));
         var result = await _repository.Add(category);
-        return result != null ? Created() : BadRequest();
+        return result != null ? Created(nameof(Post), result.ToString()) : BadRequest();
     }
 
     [HttpGet]
@@ -35,7 +35,7 @@ public class CategoryController : ControllerBase
         return result;
     }
 
-    [HttpDelete]
+    [HttpDelete("{id}")]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Delete(Guid id)
     {

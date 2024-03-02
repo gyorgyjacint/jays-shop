@@ -86,4 +86,15 @@ public class UserRepository : IUserRepository
 
         return identityUser.Id;
     }
+
+    public async Task<UserDto<Guid>?> GetById(string id)
+    {
+        var identityUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+        if (identityUser == null)
+            return null;
+
+        _logger.LogInformation($"User {identityUser.UserName} found by ID");
+        var dto = _mapper.Map<UserDto<Guid>>(identityUser);
+        return dto;
+    }
 }

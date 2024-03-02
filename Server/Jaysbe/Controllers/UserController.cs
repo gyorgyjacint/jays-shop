@@ -27,7 +27,7 @@ public class UserController : ControllerBase
     }
     
     [Authorize(Roles = "Admin")]
-    [HttpGet("{userId}")]
+    [HttpDelete("{userId}")]
     public async Task<IActionResult> Delete([FromRoute] Guid userId)
     {
         _logger.LogInformation(nameof(Delete));
@@ -42,5 +42,14 @@ public class UserController : ControllerBase
         _logger.LogInformation(nameof(Update));
         var result = await _repository.Update(user);
         return result != null ? Ok(result) : BadRequest();
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet("{id}")]
+    public async Task<ActionResult<UserDto<string>>> GetById([FromRoute] string id)
+    {
+        _logger.LogInformation(nameof(GetById));
+        var result = await _repository.GetById(id);
+        return result != null ? Ok(result) : NotFound();
     }
 }
