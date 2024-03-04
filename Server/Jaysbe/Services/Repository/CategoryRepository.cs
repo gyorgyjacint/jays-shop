@@ -61,4 +61,21 @@ public class CategoryRepository : ICategoryRepository
         
         return category.CategoryId;
     }
+    
+    public async Task<Guid?> Update(Category model)
+    {
+        var dbCategory = await _context.Categories.FindAsync(model.CategoryId);
+
+        if (dbCategory == null)
+        {
+            _logger.LogInformation($"Category with ID [{model.CategoryId}] not found");
+            return null;
+        }
+
+        dbCategory.Name = model.Name;
+        await _context.SaveChangesAsync();
+        _logger.LogInformation($"Category with ID [{model.CategoryId}] updated");
+        
+        return dbCategory.CategoryId;
+    }
 }
