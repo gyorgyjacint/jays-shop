@@ -49,8 +49,8 @@ public class CategoryController : ControllerBase
     public async Task<ActionResult> Update(Category category)
     {
         _logger.LogInformation(nameof(Update));
-        var result = await _repository.Update(category);
-        return result != null ? Ok(result) : NotFound(category.CategoryId);
+        var result = await _repository.UpdateOrAdd(category);
+        return result != null ? Ok(result) : BadRequest(category.Name);
     }
 
 }

@@ -7,6 +7,6 @@ public interface ICategoryRepository
     public Task<Category[]> GetAll();
     public Task<Guid?> Add(Category model);
     public Task<Guid?> Delete(Guid id);
-    public Task<Guid?> Update(Category model);
+    public Task<Guid?> UpdateOrAdd(Category model);
 
 }
