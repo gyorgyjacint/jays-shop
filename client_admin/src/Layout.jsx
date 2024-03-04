@@ -51,10 +51,11 @@ export default function Layout()
         return <Alert severity="error">Server is down. Please refresh or try again later.</Alert>;
     }
 
-    const handleHomeBtn = () => { window.location.replace("/home") }
-    const handleUsersBtn = () => { window.location.replace("/users") }
-    const handleProductsBtn = () => { window.location.replace("/products") }
-    const handleOrdersBtn = () => { window.location.replace("/orders") }
+    const handleHomeBtn = () => window.location.replace("/home");
+    const handleUsersBtn = () => window.location.replace("/users");
+    const handleProductsBtn = () => window.location.replace("/products");
+    const handleOrdersBtn = () => window.location.replace("/orders");
+    const handleCategoriesBtn = () => window.location.replace("/categories");
     const handleLogoutBtn = (e) => { 
         //TODO: how to log out admin (HttpOnly cookie)?
      }
@@ -69,6 +70,7 @@ export default function Layout()
                     <Button variant="contained" onClick={handleUsersBtn}>Users</Button>
                     <Button variant="contained" onClick={handleProductsBtn}>Products</Button>
                     <Button variant="contained" onClick={handleOrdersBtn}>Orders</Button>
+                    <Button variant="contained" onClick={handleCategoriesBtn}>Categories</Button>
                     <Button 
                     style={{fontWeight: 600, position: "absolute", right: "20px"}} 
                     variant="contained"
