@@ -49,6 +49,12 @@ public class CategoryRepository : ICategoryRepository
             return null;
         }
 
+        var references = _context.Products.Where(p =>  p.Category != null && p.Category.CategoryId == id);
+        foreach (var product in references)
+        {
+            product.Category = null;
+        }
+
         _context.Categories.Remove(category);
         await _context.SaveChangesAsync();
         _logger.LogInformation($"Category with ID [{id}] removed");
