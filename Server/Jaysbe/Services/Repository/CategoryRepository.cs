@@ -49,10 +49,40 @@ public class CategoryRepository : ICategoryRepository
             return null;
         }
 
+        var references = _context.Products.Where(p =>  p.Category != null && p.Category.CategoryId == id);
+        foreach (var product in references)
+        {
+            product.Category = null;
+        }
+
         _context.Categories.Remove(category);
         await _context.SaveChangesAsync();
         _logger.LogInformation($"Category with ID [{id}] removed");
         
         return category.CategoryId;
+    }
+    
+    public async Task<Guid?> UpdateOrAdd(Category model)
+    {
+        var dbCategory = await _context.Categories.FindAsync(model.CategoryId);
+        
+        if (dbCategory?.Name != model.Name && await _context.Categories.AnyAsync(c => c.Name == model.Name))
+            return null;
+
+        if (dbCategory == null)
+        {
+            
+            var entityEntry = await _context.Categories.AddAsync(model);
+            await _context.SaveChangesAsync();
+            
+            _logger.LogInformation("Category [{name}] added", model.Name);
+            return entityEntry.Entity.CategoryId;
+        }
+        
+        dbCategory.Name = model.Name;
+        await _context.SaveChangesAsync();
+        
+        _logger.LogInformation("Category with ID [{id}] updated", dbCategory.CategoryId);
+        return dbCategory.CategoryId;
     }
 }
