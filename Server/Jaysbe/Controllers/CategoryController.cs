@@ -43,5 +43,14 @@ public class CategoryController : ControllerBase
         var result = await _repository.Delete(id);
         return result != null ? Ok(result) : NotFound(id);
     }
+    
+    [HttpPatch]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult> Update(Category category)
+    {
+        _logger.LogInformation(nameof(Update));
+        var result = await _repository.Update(category);
+        return result != null ? Ok(result) : NotFound(category.CategoryId);
+    }
 
 }
