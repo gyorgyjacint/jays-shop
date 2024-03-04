@@ -65,6 +65,9 @@ public class CategoryRepository : ICategoryRepository
     public async Task<Guid?> UpdateOrAdd(Category model)
     {
         var dbCategory = await _context.Categories.FindAsync(model.CategoryId);
+        
+        if (dbCategory?.Name != model.Name && await _context.Categories.AnyAsync(c => c.Name == model.Name))
+            return null;
 
         if (dbCategory == null)
         {
@@ -75,9 +78,6 @@ public class CategoryRepository : ICategoryRepository
             _logger.LogInformation("Category [{name}] added", model.Name);
             return entityEntry.Entity.CategoryId;
         }
-
-        if (dbCategory.Name != model.Name && await _context.Categories.AnyAsync(c => c.Name == model.Name))
-            return null;
         
         dbCategory.Name = model.Name;
         await _context.SaveChangesAsync();
