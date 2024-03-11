@@ -1,4 +1,6 @@
-﻿using Jaysbe.Data;
+﻿using AutoMapper;
+using Jaysbe.Data;
+using Jaysbe.Dtos;
 using Jaysbe.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,10 +11,12 @@ public class CategoryRepository : ICategoryRepository
     
     private readonly AppDbContext _context;
     private readonly ILogger<ProductRepository> _logger;
+    private readonly IMapper _mapper;
 
-    public CategoryRepository(AppDbContext context, ILogger<ProductRepository> logger)
+    public CategoryRepository(AppDbContext context, IMapper mapper, ILogger<ProductRepository> logger)
     {
         _context = context;
+        _mapper = mapper;
         _logger = logger;
     }
     
@@ -80,6 +84,11 @@ public class CategoryRepository : ICategoryRepository
         }
         
         dbCategory.Name = model.Name;
+        if (model.Parent != null)
+            dbCategory.Parent = model.Parent;
+        if (model.ParentId != null)
+            dbCategory.ParentId = model.ParentId;
+        
         await _context.SaveChangesAsync();
         
         _logger.LogInformation("Category with ID [{id}] updated", dbCategory.CategoryId);
