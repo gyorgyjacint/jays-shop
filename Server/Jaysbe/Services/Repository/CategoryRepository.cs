@@ -20,9 +20,9 @@ public class CategoryRepository : ICategoryRepository
         _logger = logger;
     }
     
-    public async Task<Category[]> GetAll()
+    public async Task<CategoryResponse[]> GetAll()
     {
-        var result = await _context.Categories.ToArrayAsync();
+        var result = await _context.Categories.Select(c => _mapper.Map<CategoryResponse>(c)).ToArrayAsync();
         _logger.LogInformation($"{result.Length} categories found");
         return result;
     }
