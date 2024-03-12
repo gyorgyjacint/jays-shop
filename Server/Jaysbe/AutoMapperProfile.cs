@@ -14,6 +14,6 @@ public class AutoMapperProfile : Profile
         CreateMap<Product, ProductResponseDto>();
         CreateMap<IdentityUser, UserDto<Guid>>();
         CreateMap<Category, CategoryResponse>().ReverseMap();
-        CreateMap<Category, CategoryParentInfo>();
+        CreateMap<Category, CategoryBase>();
     }
 }
