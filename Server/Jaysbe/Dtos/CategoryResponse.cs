@@ -1,33 +1,33 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
-using Jaysbe.Models;
+﻿using Jaysbe.Models;
 
 namespace Jaysbe.Dtos;
 
-public class CategoryResponse
+public class CategoryResponse : Category
 {
-    public Guid? CategoryId { get; init; }
-    public string Name { get; set; }
-    public Guid? ParentId { get; init; }
-    public Category? Parent { get; init; }
-    
-    public Stack<CategoryParentInfo>? Parents
+    public CategoryResponse(Category category)
     {
-        get
-        {
-            if (Parent == null)
-                return null;
-            var categoryStack = new Stack<CategoryParentInfo>();
-            Category? examinable = Parent;
+        Name = category.Name;
+        Parent = category.Parent;
+        CategoryId = category.CategoryId;
+        ParentId = category.ParentId;
+    }
+    public Stack<CategoryBase>? Parents => GetParents();
 
-            do
-            {
-                categoryStack.Push(
-                    new CategoryParentInfo { CategoryId = examinable.CategoryId, Name = examinable.Name });
-                examinable = examinable.Parent;
-            } while (examinable?.ParentId != null && examinable.Parent != null);
-            
-            return categoryStack.Count > 0 ? categoryStack : null;
+    protected virtual Stack<CategoryBase>? GetParents()
+    {
+        if (Parent == null)
+            return null;
+
+        var categoryStack = new Stack<CategoryBase>();
+        Category? examinable = Parent;
+
+        while (examinable != null)
+        {
+            categoryStack.Push(
+                new CategoryBase { CategoryId = examinable.CategoryId, Name = examinable.Name });
+            examinable = examinable.Parent;
         }
+
+        return categoryStack.Count > 0 ? categoryStack : null;
     }
 }
