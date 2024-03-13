@@ -53,6 +53,13 @@ public class CategoryRepository : ICategoryRepository
             return null;
         }
 
+        bool hasChildren = _context.Categories.FirstOrDefault(c => c.ParentId == id) != null;
+        if (hasChildren)
+        {
+            _logger.LogInformation($"Category with ID [{id}] cannot be deleted as it has child categories");
+            return null;
+        }
+
         var references = _context.Products.Where(p =>  p.Category != null && p.Category.CategoryId == id);
         foreach (var product in references)
         {
