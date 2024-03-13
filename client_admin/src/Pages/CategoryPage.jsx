@@ -105,8 +105,14 @@ export default function CategoryPage() {
     return fetchDataAsync("api/category/update", "PATCH", JSON.stringify(newRow), {"Content-Type": "application/json"})
     .then(id => {
       if (id){
+        updatedRow.categoryId = id;
         newRow.categoryId = id;
-        setCategories(categories.map(row => row.categoryId === id ? updatedRow : row));//!!
+        // TODO on creating category, an extra empty record is visible with ID 0
+        if (newRow.isNew) {
+          updatedRow.isNew = false;
+        } else {
+          setCategories(categories.map(row => row.categoryId === id ? updatedRow : row));
+        }
         return updatedRow;
       } else {
         setShowErrorSnackbar(true);
@@ -121,6 +127,16 @@ export default function CategoryPage() {
   const columns = [
     { field: 'categoryId', headerName: 'ID', width: 180, flex: 1 },
     { field: 'name', headerName: 'Name', width: 180, editable: true, flex: 1 },
+    {
+      field: 'parents',
+      headerName: 'Parent',
+      flex: 1,
+      valueGetter: (params) => {
+        const parents = params.row.parents;
+        if (parents == null){ return null; }
+        return parents[parents.length - 1].name;
+      }
+    },
     {
       field: 'actions',
       type: 'actions',
@@ -169,7 +185,7 @@ export default function CategoryPage() {
     },
   ];
 
-  if (loading || !categories) {
+  if (loading) {
     return <Loading />;
   }
 
