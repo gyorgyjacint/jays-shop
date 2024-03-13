@@ -13,5 +13,7 @@ public class AutoMapperProfile : Profile
         CreateMap<ProductRequestDto, Product>().ReverseMap();
         CreateMap<Product, ProductResponseDto>();
         CreateMap<IdentityUser, UserDto<Guid>>();
+        CreateMap<Category, CategoryResponse>().ReverseMap();
+        CreateMap<Category, CategoryBase>();
     }
 }

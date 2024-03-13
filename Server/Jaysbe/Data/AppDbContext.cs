@@ -12,7 +12,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
 {
     public DbSet<Product> Products { get; set; }
     public DbSet<Category> Categories { get; set; }
-    public DbSet<SubCategory> SubCategories { get; set; }
     
     protected override void OnModelCreating(ModelBuilder builder)
     {

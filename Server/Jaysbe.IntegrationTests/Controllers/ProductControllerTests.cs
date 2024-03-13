@@ -68,12 +68,6 @@ public class ProductControllerTests : AuthBase, IClassFixture<CustomWebApplicati
     {
         // Arrange
         var content = new MultipartFormDataContent();
-        var subCatJson = JsonSerializer.Serialize(
-            new[]
-            {
-                new SubCategory { Name = "PostCorrectSubCat-1" },
-                new SubCategory { Name = "PostCorrectSubCat-2" }
-            });
         var prodDescJson = JsonSerializer.Serialize(
             new[]
             {
@@ -91,7 +85,6 @@ public class ProductControllerTests : AuthBase, IClassFixture<CustomWebApplicati
             { "Description", new StringContent("desc") },
             { "Color", new StringContent("color") },
             { "Category.Name", new StringContent("PostCorrectCat-1") },
-            { "Category.SubCategories", new StringContent(subCatJson) },
             { "ProductDescriptions", new StringContent(prodDescJson) }
         };
 
@@ -128,11 +121,7 @@ public class ProductControllerTests : AuthBase, IClassFixture<CustomWebApplicati
             Assert.Equivalent("desc", product.Description);
             Assert.Equivalent("color", product.Color);
             
-            // TODO check: created, tied with FK in DB, but doesnt get returned
             //Assert.Equivalent("PostCorrectCat-1", product.Category?.Name);
-            //Assert.True(product.Category?.SubCategories?.Any(s => s.Name == "PostCorrectSubCat-1"));
-            //Assert.True(product.Category?.SubCategories?.Any(s => s.Name == "PostCorrectSubCat-2"));
-            //Assert.Equivalent(2, product.Category?.SubCategories?.Count());
         });
     }
     

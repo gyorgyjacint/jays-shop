@@ -1,4 +1,5 @@
-﻿using Jaysbe.Models;
+﻿using Jaysbe.Dtos;
+using Jaysbe.Models;
 using Jaysbe.Services.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +29,7 @@ public class CategoryController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<Category[]> GetAll()
+    public async Task<CategoryResponse[]> GetAll()
     {
         _logger.LogInformation(nameof(GetAll));
         var result = await _repository.GetAll();
@@ -41,7 +42,7 @@ public class CategoryController : ControllerBase
     {
         _logger.LogInformation(nameof(Delete));
         var result = await _repository.Delete(id);
-        return result != null ? Ok(result) : NotFound(id);
+        return result != null ? Ok(result) : BadRequest(id);
     }
     
     [HttpPatch]

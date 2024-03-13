@@ -1,4 +1,6 @@
-﻿using Jaysbe.Data;
+﻿using AutoMapper;
+using Jaysbe.Data;
+using Jaysbe.Dtos;
 using Jaysbe.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,17 +10,19 @@ public class CategoryRepository : ICategoryRepository
 {
     
     private readonly AppDbContext _context;
+    private readonly IMapper _mapper;
     private readonly ILogger<ProductRepository> _logger;
 
-    public CategoryRepository(AppDbContext context, ILogger<ProductRepository> logger)
+    public CategoryRepository(AppDbContext context, IMapper mapper, ILogger<ProductRepository> logger)
     {
         _context = context;
+        _mapper = mapper;
         _logger = logger;
     }
     
-    public async Task<Category[]> GetAll()
+    public async Task<CategoryResponse[]> GetAll()
     {
-        var result = await _context.Categories.ToArrayAsync();
+        var result = await _context.Categories.Select(c => _mapper.Map<CategoryResponse>(c)).ToArrayAsync();
         _logger.LogInformation($"{result.Length} categories found");
         return result;
     }
@@ -46,6 +50,13 @@ public class CategoryRepository : ICategoryRepository
         if (category == null)
         {
             _logger.LogInformation($"Category with ID [{id}] not found");
+            return null;
+        }
+
+        bool hasChildren = _context.Categories.FirstOrDefault(c => c.ParentId == id) != null;
+        if (hasChildren)
+        {
+            _logger.LogInformation($"Category with ID [{id}] cannot be deleted as it has child categories");
             return null;
         }
 
@@ -80,6 +91,11 @@ public class CategoryRepository : ICategoryRepository
         }
         
         dbCategory.Name = model.Name;
+        if (model.Parent != null)
+            dbCategory.Parent = model.Parent;
+        if (model.ParentId != null)
+            dbCategory.ParentId = model.ParentId;
+        
         await _context.SaveChangesAsync();
         
         _logger.LogInformation("Category with ID [{id}] updated", dbCategory.CategoryId);
