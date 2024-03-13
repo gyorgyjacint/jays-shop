@@ -42,7 +42,7 @@ public class CategoryController : ControllerBase
     {
         _logger.LogInformation(nameof(Delete));
         var result = await _repository.Delete(id);
-        return result != null ? Ok(result) : NotFound(id);
+        return result != null ? Ok(result) : BadRequest(id);
     }
     
     [HttpPatch]
