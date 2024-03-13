@@ -3,12 +3,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Jaysbe.Models;
 
-public class SubCategory
+[NotMapped]
+public class CategoryBase
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public Guid? SubCategoryId { get; init; }
-    
+    public Guid? CategoryId { get; init; }
     [MaxLength(70)]
     public string Name { get; set; }
 }
