@@ -10,17 +10,19 @@ public class CategoryRepository : ICategoryRepository
 {
     
     private readonly AppDbContext _context;
+    private readonly IMapper _mapper;
     private readonly ILogger<ProductRepository> _logger;
 
-    public CategoryRepository(AppDbContext context, ILogger<ProductRepository> logger)
+    public CategoryRepository(AppDbContext context, IMapper mapper, ILogger<ProductRepository> logger)
     {
         _context = context;
+        _mapper = mapper;
         _logger = logger;
     }
     
     public async Task<CategoryResponse[]> GetAll()
     {
-        var result = await _context.Categories.Select(c => new CategoryResponse(c)).ToArrayAsync();
+        var result = await _context.Categories.Select(c => _mapper.Map<CategoryResponse>(c)).ToArrayAsync();
         _logger.LogInformation($"{result.Length} categories found");
         return result;
     }
