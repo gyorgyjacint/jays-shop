@@ -46,10 +46,6 @@ export default function CategoryPage() {
   const [showDeletedSnackbar, setShowDeletedSnackbar] = useState(false);
 
   useEffect(() => {
-    console.log(categories)
-  })
-
-  useEffect(() => {
     setLoading(true);
     fetchDataAsync("api/category/getall")
     .then(data => {
@@ -102,11 +98,18 @@ export default function CategoryPage() {
       newRow.categoryId = null;
     }
 
-    return fetchDataAsync("api/category/update", "PATCH", JSON.stringify(newRow), {"Content-Type": "application/json"})
+    let bodyData = structuredClone(newRow);
+    const parentObject = categories.find(c => c.name === bodyData.parents);
+    bodyData.parentId = parentObject.categoryId;
+    bodyData.parents = null;
+    
+    //return fetchDataAsync("api/category/update", "PATCH", JSON.stringify(newRow), {"Content-Type": "application/json"})
+    return fetchDataAsync("api/category/update", "PATCH", JSON.stringify(bodyData), {"Content-Type": "application/json"})
     .then(id => {
       if (id){
         updatedRow.categoryId = id;
         newRow.categoryId = id;
+        newRow.parents = parentObject.name
         // TODO on creating category, an extra empty record is visible with ID 0
         if (newRow.isNew) {
           updatedRow.isNew = false;
@@ -135,7 +138,17 @@ export default function CategoryPage() {
         const parents = params.row.parents;
         if (parents == null){ return null; }
         return parents[parents.length - 1].name;
-      }
+      },
+      editable: true
+    },
+    {
+      field: 'parentId',
+      valueGetter: (params) => {
+        const parents = params.row.parents;
+        if (parents == null){ return null; }
+        return parents[parents.length - 1].categoryId;
+      },
+      visible: false
     },
     {
       field: 'actions',
@@ -225,6 +238,11 @@ export default function CategoryPage() {
           toolbar: { setRows: setCategories, setRowModesModel },
         }}
         initialState={{
+          columns: {
+            columnVisibilityModel: {
+              parentId: false
+            }
+          },
           pagination: {
               paginationModel: {page: 0, pageSize: 15}
           }
