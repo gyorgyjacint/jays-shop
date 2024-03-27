@@ -11,13 +11,13 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     : IdentityDbContext<IdentityUser, IdentityRole, string>(options)
 {
     public DbSet<Product> Products { get; set; }
-    public DbSet<Category> Categories { get; set; }
+    public DbSet<Label> Labels { get; set; }
     
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
 
-        builder.Entity<Category>()
+        builder.Entity<Label>()
             .HasIndex(e => e.Name)
             .IsUnique();
 
