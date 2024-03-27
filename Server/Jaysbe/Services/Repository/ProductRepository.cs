@@ -137,8 +137,8 @@ public class ProductRepository : IProductRepository
             (model.PicturesUrls.Any(u => u == null!) || model.PicturesUrls.Any(u => u == "null")))
         {
             
-            var control = model.PicturesUrls.Where(u => u.StartsWith(accessRoute)).ToArray();
-            model.PicturesUrls = control.Length > 0 ? control : null;
+            var control = model.PicturesUrls.Where(u => u.StartsWith(accessRoute)).ToList();
+            model.PicturesUrls = control.Count > 0 ? control : null;
         }
 
         if (model.ThumbnailUrl == "null")

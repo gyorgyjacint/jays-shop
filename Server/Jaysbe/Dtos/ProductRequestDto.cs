@@ -26,5 +26,5 @@ public class ProductRequestDto
     public IFormFile Thumbnail { get; set; }
     public ICollection<IFormFile>? Pictures { get; set; }
     
-    public Category? Category { get; set; }
+    public Label? Labels { get; set; }
 }

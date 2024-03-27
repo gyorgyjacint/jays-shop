@@ -21,5 +21,5 @@ public class ProductResponseDto
     public byte[] ThumbnailBytes { get; set; }
     public IList<byte[]>? PicturesBytes { get; set; }
     
-    public Category? Category { get; set; }
+    public List<Label> Labels { get; set; }
 }

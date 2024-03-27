@@ -18,5 +18,5 @@ public class ProductTestRequest
     public BinaryData Thumbnail { get; set; }
     public ICollection<BinaryData>? Pictures { get; set; }
     
-    public Category? Category { get; set; }
+    public List<Label>? Labels { get; set; }
 }

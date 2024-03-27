@@ -31,7 +31,7 @@ public class Product
     
     [MaxLength(150)]
     public string? ThumbnailUrl { get; set; }
-    public IList<string>? PicturesUrls { get; set; }
+    public List<string>? PicturesUrls { get; set; }
     
-    public Category? Category { get; set; }
+    public List<Label> Labels { get; set; }
 }
